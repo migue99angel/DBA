@@ -1,8 +1,12 @@
 package dragonfly_caixabank;
 
 import IntegratedAgent.IntegratedAgent;
+import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MyDragonfly extends IntegratedAgent{
     
@@ -10,10 +14,11 @@ public class MyDragonfly extends IntegratedAgent{
     @Override
     public void setup() {
         super.setup();
-        receiver = this.whoLarvaAgent();
+        
 
         doCheckinPlatform();
         doCheckinLARVA();
+        receiver = this.whoLarvaAgent();
         
         _exitRequested = false;
     }
@@ -25,16 +30,26 @@ public class MyDragonfly extends IntegratedAgent{
         ACLMessage out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID(receiver,AID.ISLOCALNAME));
-        out.setContent("Hello");
+        JsonObject obj = new JsonObject();
+        obj.add("command", "login");
+        obj.add("world", "BasePlayground");
+        obj.add("attach", "alive");
+        out.setContent(obj.toString());
+        
         this.sendServer(out);
         
-        ACLMessage in = this.blockingReceive();
+        System.out.println(obj.toString());
+        
+        /*ACLMessage in = this.blockingReceive();
         String answer = in.getContent();
         Info("Respuesta"+answer);
+        
+        //ESTO ES DEL HACKATON, QUE RESPONDIAMOS DE VUELTA, CON LO DE ARRIBA DEBERIA DE SER SUFICIENTE PARA RECIBIR EL JSON RESPUESTA
+        
         String reply = new StringBuilder(answer).reverse().toString();
         out = in.createReply();
         out.setContent(reply);
-        this.send(out);
+        this.send(out);*/
 
      
         _exitRequested = true;
@@ -49,7 +64,7 @@ public class MyDragonfly extends IntegratedAgent{
         super.takeDown();
     }
 
-    private String whoLarvaAgent() {
+    protected String whoLarvaAgent() {
         return "WorldManager";
     }
     
