@@ -10,7 +10,11 @@ public class MyDragonfly extends IntegratedAgent{
     @Override
     public void setup() {
         super.setup();
-        receiver = "";
+        receiver = this.whoLarvaAgent();
+
+        doCheckinPlatform();
+        doCheckinLARVA();
+        
         _exitRequested = false;
     }
 
@@ -40,8 +44,13 @@ public class MyDragonfly extends IntegratedAgent{
 
     @Override
     protected void takeDown() {
-        Info("Bye World!");
+        doCheckoutPlatform();
+        doCheckoutLARVA();
         super.takeDown();
+    }
+
+    private String whoLarvaAgent() {
+        return "WorldManager";
     }
     
 }
