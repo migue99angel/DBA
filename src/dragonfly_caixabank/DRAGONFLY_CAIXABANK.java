@@ -10,7 +10,11 @@ import AppBoot.ConsoleBoot;
 public class DRAGONFLY_CAIXABANK {
 
     public static void main(String[] args) {
-              
+        ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
+        app.selectConnection();
+        
+        app.launchAgent("75943170X", MyDragonfly.class);
+        app.shutDown();        
     }
     
 }
