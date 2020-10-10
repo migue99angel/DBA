@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 public class MyDragonfly extends IntegratedAgent{
     
+    TTYControlPanel myControlPanel;
+    
     String receiver;
     @Override
     public void setup() {
@@ -79,6 +81,15 @@ public class MyDragonfly extends IntegratedAgent{
         ACLMessage in3 = this.blockingReceive();
         Info("Ejecución");
         Info(in3.getContent());
+        
+        //Logout
+        obj = new JsonObject();
+        obj.add("command", "logout");
+        obj.add("key", jsonObj.get("key"));
+        
+        ACLMessage out3 = in3.createReply();
+        out3.setContent(obj.toString());
+        this.sendServer(out3);
 
         _exitRequested = true;
     }
