@@ -71,8 +71,9 @@ public class MyDragonfly extends IntegratedAgent{
         obj.add("action", "rotateR");
         obj.add("key", jsonObj.get("key"));
         
-        out.setContent(obj.toString());
-        this.sendServer(out);
+        ACLMessage out2 = in2.createReply();
+        out2.setContent(obj.toString());
+        this.sendServer(out2);
         
         //Recibimos respuesta de la ejecución de la acción
         ACLMessage in3 = this.blockingReceive();

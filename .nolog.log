@@ -609,3 +609,32 @@
 {"date":"10/10/2020_19:11:14","record":{"agent":"75943170111111","info":"Requesting unregistration in LARVA"}}
 {"date":"10/10/2020_19:11:14","record":{"agent":"75943170111111","info":"Succesfully unregistered in LARVA"}}
 {"date":"10/10/2020_19:11:18","record":{"agent":"75943170111111","info":"Take down"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Load configuration"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Found CardID"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_19:38:25","record":{"agent":"75943170111111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"acl_send_REGULAR","value":{"performative":"NOT-UNDERSTOOD","sender":"75943170111111","receiver":"WorldManager","protocol":"","encoding":"","conversation":"","in-reply-to":"","reply-with":"","content":{"command":"login","world":"BasePlayground","attach":["alive","gps"]}}}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"Respuesta"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"{\"result\":\"ok\",\"key\":\"Si3ywmxQ\",\"width\":20,\"height\":20,\"maxflight\":255,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"alive\",\"gps\"]}"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"acl_send_REGULAR","value":{"performative":"NOT-UNDERSTOOD","sender":"75943170111111","receiver":"WorldManager","protocol":"","encoding":"","conversation":"","in-reply-to":"","reply-with":"","content":{"command":"read","key":"Si3ywmxQ"}}}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"Lectura"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"{\"result\":\"ok\",\"details\":{\"name\":\"75943170111111\",\"perceptions\":[{\"sensor\":\"alive\",\"data\":[1]},{\"sensor\":\"gps\",\"data\":[[10,10,10]]}]}}"}}
+{"date":"10/10/2020_19:38:26","record":{"agent":"75943170111111","info":"acl_send_REGULAR","value":{"performative":"INFORM","sender":"","receiver":"WorldManager","protocol":"REGULAR","encoding":"","conversation":"Si3ywmxQ","in-reply-to":"Si3ywmxQ","reply-with":"WorldManager@ISG21602351506897","content":{"command":"execute","action":"rotateR","key":"Si3ywmxQ"}}}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Ejecución"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"{\"result\":\"ok\"}"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Execute body"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Single shutting down"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_19:38:27","record":{"agent":"75943170111111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_19:38:31","record":{"agent":"75943170111111","info":"Take down"}}
