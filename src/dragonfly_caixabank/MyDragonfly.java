@@ -18,7 +18,6 @@ public class MyDragonfly extends IntegratedAgent{
     public void setup() {
         super.setup();
         
-
         doCheckinPlatform();
         doCheckinLARVA();
         receiver = this.whoLarvaAgent();
@@ -28,7 +27,6 @@ public class MyDragonfly extends IntegratedAgent{
 
     @Override
     public void plainExecute() {
-        
         
         ACLMessage out = new ACLMessage();
         out.setSender(getAID());
@@ -66,12 +64,23 @@ public class MyDragonfly extends IntegratedAgent{
         ACLMessage in2 = this.blockingReceive();
         Info("Lectura");
         Info(in2.getContent());
+        
+        //Ejecutamos una acción
+        obj = new JsonObject();
+        obj.add("command", "execute");
+        obj.add("action", "rotateR");
+        obj.add("key", jsonObj.get("key"));
+        
+        out.setContent(obj.toString());
+        this.sendServer(out);
+        
+        //Recibimos respuesta de la ejecución de la acción
+        ACLMessage in3 = this.blockingReceive();
+        Info("Ejecución");
+        Info(in3.getContent());
 
-     
         _exitRequested = true;
     }
-        
-
 
     @Override
     protected void takeDown() {
