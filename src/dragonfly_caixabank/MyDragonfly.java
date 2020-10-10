@@ -1,6 +1,7 @@
 package dragonfly_caixabank;
 
 import IntegratedAgent.IntegratedAgent;
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonParser;
 import com.eclipsesource.json.JsonObject;
@@ -33,6 +34,7 @@ public class MyDragonfly extends IntegratedAgent{
         out.setSender(getAID());
         out.addReceiver(new AID(receiver,AID.ISLOCALNAME));
         
+        //Hacemos el login
         JsonObject obj = new JsonObject();
         obj.add("command", "login");
         obj.add("world", "BasePlayground");
@@ -45,23 +47,25 @@ public class MyDragonfly extends IntegratedAgent{
         out.setContent(obj.toString());
         this.sendServer(out);
         
+        //Recibimos la key
         ACLMessage in = this.blockingReceive();
+        Info("Respuesta");
+        Info(in.getContent());
+        JsonObject jsonObj = new JsonObject();
+        jsonObj = Json.parse(in.getContent().toString()).asObject();
 
-        JsonObject jsonObj = new JsonObject(in.getContent());
-        
+        //Hacemos la lectura de los sensores
         obj = new JsonObject();
         obj.add("command", "read");
         obj.add("key", jsonObj.get("key"));
         
-        out.setContent(answer);
+        out.setContent(obj.toString());
         this.sendServer(out);
-        /*
-        //ESTO ES DEL HACKATON, QUE RESPONDIAMOS DE VUELTA, CON LO DE ARRIBA DEBERIA DE SER SUFICIENTE PARA RECIBIR EL JSON RESPUESTA
         
-        String reply = new StringBuilder(answer).reverse().toString();
-        out = in.createReply();
-        out.setContent(reply);
-        this.send(out);*/
+        //Recibimos los valores de los sensores
+        ACLMessage in2 = this.blockingReceive();
+        Info("Lectura");
+        Info(in2.getContent());
 
      
         _exitRequested = true;
