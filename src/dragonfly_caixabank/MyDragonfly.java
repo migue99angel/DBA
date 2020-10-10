@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 
 public class MyDragonfly extends IntegratedAgent{
     
-    TTYControlPanel myControlPanel;
-    
     String receiver;
     @Override
     public void setup() {
