@@ -1,6 +1,8 @@
 package dragonfly_caixabank;
 
 import IntegratedAgent.IntegratedAgent;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonParser;
 import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
@@ -30,20 +32,30 @@ public class MyDragonfly extends IntegratedAgent{
         ACLMessage out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID(receiver,AID.ISLOCALNAME));
+        
         JsonObject obj = new JsonObject();
         obj.add("command", "login");
         obj.add("world", "BasePlayground");
-        obj.add("attach", "alive");
-        out.setContent(obj.toString());
+        String mysensors[] = {"alive","gps"};
+        JsonArray toContent = new JsonArray();
+        toContent.add("alive");
+        toContent.add("gps");
+        obj.add("attach", toContent);
         
+        out.setContent(obj.toString());
         this.sendServer(out);
         
-        System.out.println(obj.toString());
+        ACLMessage in = this.blockingReceive();
+
+        JsonObject jsonObj = new JsonObject(in.getContent());
         
-        /*ACLMessage in = this.blockingReceive();
-        String answer = in.getContent();
-        Info("Respuesta"+answer);
+        obj = new JsonObject();
+        obj.add("command", "read");
+        obj.add("key", jsonObj.get("key"));
         
+        out.setContent(answer);
+        this.sendServer(out);
+        /*
         //ESTO ES DEL HACKATON, QUE RESPONDIAMOS DE VUELTA, CON LO DE ARRIBA DEBERIA DE SER SUFICIENTE PARA RECIBIR EL JSON RESPUESTA
         
         String reply = new StringBuilder(answer).reverse().toString();

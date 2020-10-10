@@ -384,3 +384,124 @@
 {"date":"09/10/2020_21:25:32","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
 {"date":"09/10/2020_21:25:32","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
 {"date":"09/10/2020_21:25:36","record":{"agent":"7594317011111","info":"Take down"}}
+{"date":"10/10/2020_15:14:47","record":{"agent":"7594317011111","info":"Load configuration"}}
+{"date":"10/10/2020_15:14:47","record":{"agent":"7594317011111","info":"Found CardID"}}
+{"date":"10/10/2020_15:14:47","record":{"agent":"7594317011111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_15:14:47","record":{"agent":"7594317011111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_15:14:47","record":{"agent":"7594317011111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_15:14:47","record":{"agent":"7594317011111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_15:14:48","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_15:14:52","record":{"agent":"7594317011111","info":"Take down"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Load configuration"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Found CardID"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_15:15:31","record":{"agent":"7594317011111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"acl_send_REGULAR","value":{"performative":"NOT-UNDERSTOOD","sender":"7594317011111","receiver":"WorldManager","protocol":"","encoding":"","conversation":"","in-reply-to":"","reply-with":"","content":{"command":"login","world":"BasePlayground"}}}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Execute body"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Single shutting down"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_15:15:32","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_15:15:36","record":{"agent":"7594317011111","info":"Take down"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Load configuration"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Found CardID"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_15:18:16","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_15:18:20","record":{"agent":"7594317011111","info":"Take down"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Load configuration"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Found CardID"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"acl_send_REGULAR","value":{"performative":"NOT-UNDERSTOOD","sender":"7594317011111","receiver":"WorldManager","protocol":"","encoding":"","conversation":"","in-reply-to":"","reply-with":"","content":{"command":"login","world":"BasePlayground"}}}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Execute body"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Single shutting down"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_15:18:58","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_15:18:59","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_15:19:03","record":{"agent":"7594317011111","info":"Take down"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Load configuration"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Found CardID"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"acl_send_REGULAR","value":{"performative":"NOT-UNDERSTOOD","sender":"7594317011111","receiver":"WorldManager","protocol":"","encoding":"","conversation":"","in-reply-to":"","reply-with":"","content":{"command":"login","world":"BasePlayground","attach":["alive","gps"]}}}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Execute body"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Single shutting down"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_15:22:57","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_15:22:58","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_15:23:02","record":{"agent":"7594317011111","info":"Take down"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Load configuration"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Found CardID"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"CardID: gF25LcjUcB5EF2Jx which belongs to MIGUEL ANGEL POSADAS ARRAEZ (CaixaBank)"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Chekin confirmed in the platform"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Trying to register in LARVA"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Found ASSIGNMENTID 1"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 1>"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"LARVA Agent WorldManager found. Requesting registration"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_15:23:14","record":{"agent":"7594317011111","info":"acl_send_REGULAR","value":{"performative":"NOT-UNDERSTOOD","sender":"7594317011111","receiver":"WorldManager","protocol":"","encoding":"","conversation":"","in-reply-to":"","reply-with":"","content":{"command":"login","world":"BasePlayground","attach":["alive","gps"]}}}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Respuesta{\"result\":\"ok\",\"key\":\"ltHRT8Xv\",\"width\":20,\"height\":20,\"maxflight\":255,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"alive\",\"gps\"]}"}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Execute body"}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Single shutting down"}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_15:23:15","record":{"agent":"7594317011111","info":"Succesfully unregistered in LARVA"}}
+{"date":"10/10/2020_15:23:19","record":{"agent":"7594317011111","info":"Take down"}}
