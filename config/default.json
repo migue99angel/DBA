@@ -8,6 +8,7 @@
         "port": 1099
     },
     "analytics": {
-        "assignmentid": 1
+        "assignmentid": 2,
+        "group": "CaixaBank"
     }  
 }
