@@ -24,12 +24,15 @@ public class MyDragonfly extends IntegratedAgent{
     float fixedAngular;
     float compass;
     boolean onTarget = false;
+    boolean recargando = false;
     int alturaDron;
     int alturaSuelo;
     int energia = 1000;
     float distance;
     int numSensores;
     boolean alineado = false;
+    int maxflight;
+    String estado = "LOCALIZADO";
     ArrayList<Integer> visual = new ArrayList<>();
     @Override
     public void setup() {
@@ -54,7 +57,7 @@ public class MyDragonfly extends IntegratedAgent{
         //Hacemos el login
         JsonObject jsonObjIn = new JsonObject();
         jsonObjIn.add("command", "login");
-        jsonObjIn.add("world", "World1");
+        jsonObjIn.add("world", "Playground2");
 
         JsonArray toContent = new JsonArray();
         toContent.add("alive");
@@ -83,7 +86,7 @@ public class MyDragonfly extends IntegratedAgent{
         
         int width = jsonObjOut.get("width").asInt();
         int height = jsonObjOut.get("height").asInt();
-        int maxheight = jsonObjOut.get("maxflight").asInt();
+        this.maxflight = jsonObjOut.get("maxflight").asInt();
         String key = jsonObjOut.get("key").asString();
         
         //Hacemos la lectura de los sensores
@@ -105,7 +108,7 @@ public class MyDragonfly extends IntegratedAgent{
             System.out.println(this.compass);
             System.out.println(this.angular);
             
-            myControlPanel.feedData(in,width , height, maxheight);
+            myControlPanel.feedData(in,width , height, this.maxflight);
             myControlPanel.fancyShow();
             
             Info("Lectura");
@@ -115,7 +118,7 @@ public class MyDragonfly extends IntegratedAgent{
             jsonObjIn = new JsonObject();
             jsonObjIn.add("command", "execute");
            
-
+            
             jsonObjIn.add("action", funcionHeuristica() );
                         
             jsonObjIn.add("key", key);
@@ -172,43 +175,93 @@ public class MyDragonfly extends IntegratedAgent{
     String funcionHeuristica() {
         String eleccion = "";
         Integer maxAltura = Collections.max(this.visual);
-        if (this.distance == 0){
-            if (this.alturaDron > 5){
-                eleccion = "moveD";
-                this.energia -= 5;
-            } else if (this.alturaDron > 0) {
-                eleccion = "touchD";
-                this.energia -= 1;
+        if(estado=="LOCALIZADO"){
+            if (this.distance == 0){
+                if (this.alturaDron > 5){
+                    eleccion = "moveD";
+                    this.energia -= 5;
+                } else if (this.alturaDron > 0) {
+                    eleccion = "touchD";
+                    this.energia -= 1;
+                } else {
+                    eleccion = "rescue";
+                    this.onTarget = true;
+                }
+            } 
+            else if (this.energia - ( (this.alturaDron/5)*(5 + this.numSensores)) < 50|| this.recargando) {
+                this.recargando = true;
+                if (this.alturaDron > 5) {
+                    eleccion = "moveD";
+                    this.energia -= 5;
+                } else if (this.alturaDron > 0){
+                    eleccion = "touchD";
+                    this.energia -= this.alturaDron;
+                }else {
+                    eleccion = "recharge";
+                    this.energia = 1000;
+                    this.recargando = false;
+                }
+            }
+            else if (this.alturaDron + this.alturaSuelo <= maxAltura ) {
+                if(this.alturaDron+this.alturaSuelo + 5 < this.maxflight){
+                    eleccion = "moveUP";
+                    this.energia -= 5;
+                }
+                else{
+                    this.estado = "BORDEANDO";
+                }
+            } else { // 0 45 90 135 180 -45 -90 -135
+                if (this.angular == this.compass || (this.fixedAngular == this.compass && !this.alineado) ) {
+                    eleccion = "moveF";
+                    this.energia -= 1;
+                }
+                else {
+                    eleccion = mejorRotacion(this.compass, this.angular);
+                    this.energia -= 1;
+                }   
+            }
+        }
+        if(estado=="BORDEANDO"){
+            //-45 -> 0 | 0 -> 1 | 45 -> 2 | -90 -> 3 | 90 -> 5 | -135 -> 6 | 180 ->7 | 135 -> 8
+            int alturaProxima = 0;
+
+            switch ((int)this.compass){
+                case -45:
+                    alturaProxima = this.visual.get(0);
+                    break;
+                case 0:
+                    alturaProxima = this.visual.get(1);
+                    break;
+                case 45:
+                    alturaProxima = this.visual.get(2);
+                    break;
+                case -90:
+                    alturaProxima = this.visual.get(3);
+                    break;
+                case 90:
+                    alturaProxima = this.visual.get(5);
+                    break;
+                case -135:
+                    alturaProxima = this.visual.get(6);
+                    break;
+                case 180:
+                    alturaProxima = this.visual.get(7);
+                    break;
+                case 135:
+                    alturaProxima = this.visual.get(8);
+                    break; 
+            }
+            System.out.println("ALTURA MAX            "+alturaProxima+"              MAX FLIGHT"+this.maxflight);
+            if(alturaProxima+5 >= this.maxflight){
+                eleccion="rotateR";
             } else {
-                eleccion = "rescue";
-                this.onTarget = true;
-            }
-        } 
-        else if (this.energia < this.alturaDron/5 * 5 *(this.numSensores + 5) +100) {
-            if (this.alturaDron > 5) {
-                eleccion = "moveD";
-                this.energia -= 5;
-            } else if (this.alturaDron > 0){
-                eleccion = "touchD";
-                this.energia -= 1;
-            }else {
-                eleccion = "recharge";
-                this.energia = 1000;
+                eleccion="moveF";
+                this.alineado = false;
+                estado="LOCALIZADO";
             }
         }
-        else if (this.alturaDron + this.alturaSuelo <= maxAltura ) {
-            eleccion = "moveUP";
-            this.energia -= 5;
-        } else { // 0 45 90 135 180 -45 -90 -135
-            if (this.angular == this.compass || (this.fixedAngular == this.compass && !this.alineado) ) {
-                eleccion = "moveF";
-                this.energia -= 1;
-            }
-            else {
-                eleccion = "rotateR";
-                this.energia -= 1;
-            }   
-        }
+
+       Info("ESTADO     "+estado);
         
         return eleccion;
     }
@@ -276,5 +329,43 @@ public class MyDragonfly extends IntegratedAgent{
             }
         }
         
+    }
+    
+    
+    String mejorRotacion(float angPos, float angObj)
+    {
+        String rotacion = "R";
+        String rotacionaccion = "rotate";
+
+        if (angPos > 0 && angObj >0)
+        {
+            if (angPos > angObj)
+            {
+                rotacion = "L";
+            }
+        }
+        else if (angPos < 0 && angObj < 0)
+        {
+            if (angPos > angObj)
+            {
+                rotacion = "L";
+            }
+        }
+        else if (angPos < 0 && angObj >0)
+        {
+            if (angPos < -90 && angObj > 90)
+            {
+                rotacion = "L";
+            }
+        }
+        else {
+            if (angPos < 90 && angObj < -90)
+            {
+                rotacion = "L";
+            }
+        }
+
+        return rotacionaccion.concat(rotacion);
+
     }
 }
