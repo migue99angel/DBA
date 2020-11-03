@@ -251,7 +251,7 @@ public class MyDragonfly extends IntegratedAgent{
                     alturaProxima = this.visual.get(8);
                     break; 
             }
-            System.out.println("ALTURA MAX            "+alturaProxima+"              MAX FLIGHT"+this.maxflight);
+            
             if(alturaProxima+5 >= this.maxflight){
                 eleccion="rotateR";
             } else {
@@ -261,7 +261,6 @@ public class MyDragonfly extends IntegratedAgent{
             }
         }
 
-       Info("ESTADO     "+estado);
         
         return eleccion;
     }
@@ -353,13 +352,13 @@ public class MyDragonfly extends IntegratedAgent{
         }
         else if (angPos < 0 && angObj >0)
         {
-            if (angPos < -90 && angObj > 90)
+            if (angPos < -90 && angObj >= 90)
             {
                 rotacion = "L";
             }
         }
         else {
-            if (angPos < 90 && angObj < -90)
+            if (angPos < 90 && angObj <= -90)
             {
                 rotacion = "L";
             }
