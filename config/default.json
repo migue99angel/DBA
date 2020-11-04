@@ -1,7 +1,7 @@
 {
     "log": false,
     "silent": false,
-    "system": true,
+    "system": false,
     "boot": "jade",
     "jadeconnection": {
         "host": "isg2.ugr.es",

@@ -61,8 +61,6 @@ public class Coordenadas {
         Boolean resultado = false;
         if((this.getX() == aux.getX()) && (this.getY() == aux.getY())){
             resultado = true;
-            System.out.println("("+this.x+","+this.y+")");
-            System.out.println("("+aux.x+","+aux.y+")");
         }
 
         
