@@ -18,6 +18,11 @@ import java.util.logging.Logger;
 
 
 public class MyDragonfly extends IntegratedAgent{
+    
+    float energy = 0.0f;
+    int cooldown = 0;
+    String mejorR = "rotateR"; //R
+    
     TTYControlPanel myControlPanel;
     String receiver;
     int alive;
@@ -60,13 +65,14 @@ public class MyDragonfly extends IntegratedAgent{
         //Hacemos el login
         JsonObject jsonObjIn = new JsonObject();
         jsonObjIn.add("command", "login");
-        jsonObjIn.add("world", "World8");
+        jsonObjIn.add("world", "World9");
 
         JsonArray toContent = new JsonArray();
         toContent.add("alive");
         toContent.add("gps");
         toContent.add("distance");
-        //toContent.add("ontarget");
+        toContent.add("energy");
+        toContent.add("ontarget");
         toContent.add("altimeter");
         toContent.add("compass");
         toContent.add("visual");
@@ -123,7 +129,7 @@ public class MyDragonfly extends IntegratedAgent{
             jsonObjIn.add("action", funcionHeuristica() );
                         
             jsonObjIn.add("key", key);
-
+            
             out = in.createReply();
             out.setContent(jsonObjIn.toString());
             
@@ -146,8 +152,9 @@ public class MyDragonfly extends IntegratedAgent{
             //Recibimos los valores de los sensores
             in = this.blockingReceive();
             jsonObjOut = Json.parse(in.getContent().toString()).asObject();
-            //Info(in.getContent());
+            Info(in.getContent());
             lecturaSensores(jsonObjOut);
+            
 
         }
         //myControlPanel.close();
@@ -176,7 +183,7 @@ public class MyDragonfly extends IntegratedAgent{
     
     String funcionHeuristica() {
         String eleccion = "";
-        System.out.println("Estado: "+this.estado);
+        //System.out.println("Estado: "+this.estado);
 
                     int alturaProxima = 0;
             Coordenadas coorProxima = new Coordenadas(this.coordenadas.get(this.coordenadas.size()-1).getX(),this.coordenadas.get(this.coordenadas.size()-1).getY());
@@ -220,7 +227,7 @@ public class MyDragonfly extends IntegratedAgent{
                     break; 
             }
             
-            
+        //System.out.println(this.estado);
             
         if(this.estado=="LOCALIZADO"){
             if (this.distance == 0){
@@ -236,6 +243,7 @@ public class MyDragonfly extends IntegratedAgent{
                 }
             } 
             else if (this.energia - ( (this.alturaDron/5)*(5 + this.numSensores)) < 100|| this.recargando) {
+                cooldown++;
                 this.recargando = true;
                 if (this.alturaDron > 5) {
                     eleccion = "moveD";
@@ -259,18 +267,34 @@ public class MyDragonfly extends IntegratedAgent{
                 }
             } else { // 0 45 90 135 180 -45 -90 -135
                 if (this.angular == this.compass || (this.fixedAngular == this.compass && !this.alineado) ) {
-                    eleccion = "moveF";
-                    this.energia -= 1;
+                    if (this.compruebaCasilla(coorProxima)){
+                        this.estado = "BORDEANDO";
+                    } else {
+                        eleccion = "moveF";
+                        this.energia -= 1;
+                    }
                 }
                 else {
                     eleccion = mejorRotacion(this.compass, this.angular);
                     this.energia -= 1;
                 }   
             }
+            cooldown--;
         }
         if(estado=="BORDEANDO"){
-            if((alturaProxima+5 > this.maxflight) || this.compruebaCasilla(coorProxima)){
-                eleccion="rotateL";
+            if (cooldown < 0){
+                if (mejorR == "rotateL"){
+                    mejorR = "rotateR";
+                } else {
+                    mejorR = "rotateL";
+                }
+            }
+            cooldown = 12;
+            //System.out.println(this.maxflight + " con " +alturaProxima);
+            //System.out.println(this.compruebaCasilla(coorProxima) + " con " + coorProxima);
+
+            if((alturaProxima+1 >= this.maxflight) || this.compruebaCasilla(coorProxima)){
+                eleccion = mejorR;
             } else {
                 eleccion="moveF";
                 this.alineado = false;
@@ -300,16 +324,20 @@ public class MyDragonfly extends IntegratedAgent{
                     if (this.angular%45 != 0.0f){
                     
                         if (this.angular < 0.0f) {
-                            if (this.angular < -90.0f) {
-                                this.fixedAngular = -135.0f;
+                            if (this.angular < -90.0f && this.angular > -135.0f) {
+                                this.fixedAngular = -90f;
+                            } else if (this.angular < -135.0f){
+                                this.fixedAngular = 180f;
                             } else {
                                 this.fixedAngular = -45.0f;
                             }
                         } else {
                             if (this.angular < 90.0f) {
                                this.fixedAngular = 45f;
-                            } else {
+                            } else if (this.angular > 90.0f && this.angular < 135.0f){
                                 this.fixedAngular = 135f;
+                            } else {
+                                this.fixedAngular = 180f;
                             }
                         }
                     } else {
@@ -352,7 +380,7 @@ public class MyDragonfly extends IntegratedAgent{
                     if(!compruebaCasilla(c_aux)){
                         //System.out.println(c_aux);
                         this.coordenadas.add(c_aux);
-                        System.out.println(this.coordenadas);
+                        //System.out.println(this.coordenadas);
                     }
                         
                     
@@ -393,7 +421,7 @@ public class MyDragonfly extends IntegratedAgent{
         else {
             if (angPos < 90 && angObj <= -90)
             {
-                rotacion = "L";
+                rotacion = "R";
             }
         }
 
@@ -405,6 +433,8 @@ public class MyDragonfly extends IntegratedAgent{
         for(int i = 0; (i < this.coordenadas.size()); i++){
             if(this.coordenadas.get(i).esIgual(aux))
             {
+                //System.out.println("OJOOOOOOOOOOOOOOOOO");
+                //System.out.println(this.coordenadas.get(i) + " es igual que " + aux);
                 return true;
             }
                 
