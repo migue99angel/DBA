@@ -36,7 +36,6 @@ public class MyDragonfly extends IntegratedAgent{
     int energia = 1000;
     float distance;
     int numSensores;
-    boolean alineado = false;
     int maxflight;
     String estado = "LOCALIZADO";
     ArrayList<Integer> visual = new ArrayList<>();
@@ -49,7 +48,7 @@ public class MyDragonfly extends IntegratedAgent{
         doCheckinPlatform();
         doCheckinLARVA();
         receiver = this.whoLarvaAgent();
-        //myControlPanel = new TTYControlPanel(getAID());
+        myControlPanel = new TTYControlPanel(getAID());
         _exitRequested = false;
     }
 
@@ -88,8 +87,8 @@ public class MyDragonfly extends IntegratedAgent{
         
         //Recibimos la key
         in = this.blockingReceive();
-        //Info("Respuesta");
-        //Info(in.getContent());
+        Info("Respuesta");
+        Info(in.getContent());
         JsonObject jsonObjOut = new JsonObject();
         jsonObjOut = Json.parse(in.getContent().toString()).asObject();
         
@@ -115,11 +114,11 @@ public class MyDragonfly extends IntegratedAgent{
         {
 
             
-            //myControlPanel.feedData(in,width , height, this.maxflight);
-            //myControlPanel.fancyShow();
+            myControlPanel.feedData(in,width , height, this.maxflight);
+            myControlPanel.fancyShow();
             
-            //Info("Lectura");
-            //Info(in.getContent());
+            Info("Lectura");
+            Info(in.getContent());
 
             //Ejecutamos una acción
             jsonObjIn = new JsonObject();
@@ -137,8 +136,8 @@ public class MyDragonfly extends IntegratedAgent{
             
             //Recibimos respuesta de la ejecución de la acción
             in = this.blockingReceive();
-            //Info("Ejecución");
-            //Info(in.getContent());
+            Info("Ejecución");
+            Info(in.getContent());
             
             //Hacemos la lectura de los sensores
             jsonObjIn = new JsonObject();
@@ -152,12 +151,12 @@ public class MyDragonfly extends IntegratedAgent{
             //Recibimos los valores de los sensores
             in = this.blockingReceive();
             jsonObjOut = Json.parse(in.getContent().toString()).asObject();
-            //Info(in.getContent());
+            Info(in.getContent());
             lecturaSensores(jsonObjOut);
             
 
         }
-        //myControlPanel.close();
+        myControlPanel.close();
         //Logout
         jsonObjIn = new JsonObject();
         jsonObjIn.add("command", "logout");
@@ -266,7 +265,7 @@ public class MyDragonfly extends IntegratedAgent{
                     this.estado = "BORDEANDO";
                 }
             } else { // 0 45 90 135 180 -45 -90 -135
-                if (this.angular == this.compass || (this.fixedAngular == this.compass && !this.alineado) ) {
+                if (this.angular == this.compass || (this.fixedAngular == this.compass && this.angular%45 != 0.0f) ) {
                     if (this.compruebaCasilla(coorProxima)){
                         this.estado = "BORDEANDO";
                     } else {
@@ -296,7 +295,6 @@ public class MyDragonfly extends IntegratedAgent{
                 eleccion = mejorR;
             } else {
                 eleccion="moveF";
-                this.alineado = false;
                 estado="LOCALIZADO";
             }
         }
@@ -319,31 +317,7 @@ public class MyDragonfly extends IntegratedAgent{
                    break;
                 case "angular":
                     this.angular = aux.get(i).asObject().get("data").asArray().get(0).asFloat();
-                    
-                    if (this.angular%45 != 0.0f){
-                    
-                        if (this.angular < 0.0f) {
-                            if (this.angular < -90.0f && this.angular > -135.0f) {
-                                this.fixedAngular = -90f;
-                            } else if (this.angular < -135.0f){
-                                this.fixedAngular = 180f;
-                            } else {
-                                this.fixedAngular = -45.0f;
-                            }
-                        } else {
-                            if (this.angular < 90.0f) {
-                               this.fixedAngular = 45f;
-                            } else if (this.angular > 90.0f && this.angular < 135.0f){
-                                this.fixedAngular = 135f;
-                            } else {
-                                this.fixedAngular = 180f;
-                            }
-                        }
-                    } else {
-                        this.alineado = true;
-                    }
-                    
-                                        
+                    this.fixedAngular = fixAngular(this.angular);                  
                    break;
                 case "compass":
                     this.compass = aux.get(i).asObject().get("data").asArray().get(0).asFloat();
@@ -388,6 +362,36 @@ public class MyDragonfly extends IntegratedAgent{
         
     }
     
+    float fixAngular(float ang)
+    {
+        float fixedAng = ang;
+        if (ang % 45.0f != 0.0f)
+        {        
+            if (ang < 0.0f)
+            {
+                if (ang > -90.0f)
+                {
+                    fixedAng = -45.0f;
+                }
+                else
+                {
+                    fixedAng = -135.0f;
+                }
+            } 
+            else
+            {
+                if (ang < 90.0f)
+                {
+                    fixedAng = 45.0f;
+                }
+                else
+                {
+                    fixedAng = 135.0f;
+                }
+            }
+        }
+        return fixedAng;
+    }
     
     String mejorRotacion(float angPos, float angObj)
     {
@@ -418,12 +422,10 @@ public class MyDragonfly extends IntegratedAgent{
         else {
             if (angPos < 90 && angObj <= -90)
             {
-                rotacion = "R";
+                rotacion = "L";
             }
         }
-
         return rotacionaccion.concat(rotacion);
-
     }
     
     public Boolean compruebaCasilla(Coordenadas aux){
