@@ -192,7 +192,7 @@ public class MyDragonfly extends IntegratedAgent{
      * nuestra función heurística.
      * @return String El mejor movimiento seleccionado
      */
-    String funcionHeuristica() {
+    protected String funcionHeuristica() {
         String eleccion = "";
 
 
@@ -321,7 +321,7 @@ public class MyDragonfly extends IntegratedAgent{
      * de clase previamente declaradas
      * @param jsonObjOut JsonObject con todos los sensores leídos
      */
-    void lecturaSensores(JsonObject jsonObjOut)
+    protected void lecturaSensores(JsonObject jsonObjOut)
     {
         this.energia -= (1 * this.numSensores);
         JsonArray aux = jsonObjOut.get("details").asObject().get("perceptions").asArray();
@@ -385,7 +385,7 @@ public class MyDragonfly extends IntegratedAgent{
      * que puedan ser traducidos a giros
      * @return Angular aproximado
      */
-    float fixAngular(float ang)
+    protected float fixAngular(float ang)
     {
         float fixedAng = ang;
         if (ang % 45.0f != 0.0f)
@@ -421,7 +421,7 @@ public class MyDragonfly extends IntegratedAgent{
      * teniendo en cuenta los valores actuales del compass y el angular
      * @return Elección tomada
      */
-    String mejorRotacion(float angPos, float angObj)
+    protected String mejorRotacion(float angPos, float angObj)
     {
         String rotacion = "R";
         String rotacionaccion = "rotate";
@@ -462,7 +462,7 @@ public class MyDragonfly extends IntegratedAgent{
      * @param aux Coordenadas a comprobar
      * @return True si coinciden ambas coordenadas, false en caso contrario
      */
-    public Boolean compruebaCasilla(Coordenadas aux){
+    protected Boolean compruebaCasilla(Coordenadas aux){
         for(int i = 0; (i < this.coordenadas.size()); i++){
             if(this.coordenadas.get(i).esIgual(aux))
             {
