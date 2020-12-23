@@ -15,8 +15,10 @@ public class DRAGONFLY_CAIXABANK {
     public static void main(String[] args) {
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
         app.selectConnection();
-        app.launchAgent("7594314", MyDragonfly.class);
-        app.shutDown();        
+        
+        app.launchAgent("CaixaBank_Controlador", Controlador.class);
+        app.launchAgent("CaixaBank_Seeker", AgenteBase.class);
+        app.shutDown();
     }
     
 }
