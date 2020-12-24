@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"dragonfly_caixabank","l":"Coordenadas"},{"p":"dragonfly_caixabank","l":"DRAGONFLY_CAIXABANK"},{"p":"dragonfly_caixabank","l":"MyDragonfly"}]

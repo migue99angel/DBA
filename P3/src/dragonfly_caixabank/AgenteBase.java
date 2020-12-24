@@ -3,20 +3,12 @@ package dragonfly_caixabank;
 import ControlPanel.TTYControlPanel;
 import IntegratedAgent.IntegratedAgent;
 import YellowPages.YellowPages;
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonParser;
-import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
-public class AgenteBase extends IntegratedAgent {
+public abstract class AgenteBase extends IntegratedAgent {
     TTYControlPanel myControlPanel;
     String receiver;
     YellowPages yp = new YellowPages();
@@ -24,9 +16,8 @@ public class AgenteBase extends IntegratedAgent {
     ACLMessage in = new ACLMessage();
     ACLMessage out = new ACLMessage();
     
-    protected String myService, myWorldManager, myConvId;
-    protected ArrayList<String> agentesLanzados;
-    
+    protected String myService, myWorldManager, myConvId, myValue, myAction, myWMProtocol, mySphinxConvId;
+    protected ArrayList<String> tiendas;
     
     @Override
     public void setup() {
@@ -46,12 +37,6 @@ public class AgenteBase extends IntegratedAgent {
     @Override
     public void plainExecute() {       
         loginSphinx();
-        loginWorldManager();
-        
-        logout();
-        
-        takeDown();
-        _exitRequested = true;
     }
     
     @Override
@@ -61,25 +46,21 @@ public class AgenteBase extends IntegratedAgent {
         super.takeDown();
     }
     
+    @Override
     protected String whoLarvaAgent() {
         return "CaixaBank";
     }
     
     protected void loginSphinx() {
         
-        Info("Requesting checkin to " + _identitymanager);
-        out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
-        out.setProtocol("ANALYTICS");
-        out.setContent("");
-        out.setEncoding(_myCardID.getCardID());
-        out.setPerformative(ACLMessage.QUERY_IF);
-        this.send(out);
+        Info("Requesting checkin to " + _identitymanager + " from agent " + getAID());
+        
+        enviarMensaje(_identitymanager, ACLMessage.QUERY_IF, "ANALYTICS", "", "", true);
         
         in = this.blockingReceive();
         
         if(in.getPerformative() != ACLMessage.CONFIRM) {
-            Info("Error en QUERY_IF de Sphinx");
+            Info("Error en QUERY_IF de Sphinx de Agente " + getAID());
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
             
@@ -95,8 +76,9 @@ public class AgenteBase extends IntegratedAgent {
             in = blockingReceive();
             
             if(in.getPerformative() == ACLMessage.CONFIRM || (in.getPerformative() == ACLMessage.INFORM && in.getContent().contains("ok"))) {
-                Info("SUBSCRIBE OK");
-                myConvId = in.getConversationId();
+                Info("SUBSCRIBE OK de Agente " + getAID());
+                
+                mySphinxConvId = in.getConversationId();
                 
                 out = new ACLMessage();
                 out = in.createReply();
@@ -107,21 +89,20 @@ public class AgenteBase extends IntegratedAgent {
                 in = blockingReceive();
                 
                 if(in.getPerformative() == ACLMessage.INFORM) {
-                    Info("QUERY_REF OK");
+                    Info("QUERY_REF OK de Agente " + getAID());
                     yp.updateYellowPages(in);
                     //System.out.println("\n" + yp.prettyPrint());
-                    //Info(yp.queryProvidersofService("shop").toString());
-                    
+                                       
                     myWorldManager = yp.queryProvidersofService(myService).iterator().next();
                 } else {
-                    Info("Error en QUERY_REF de Sphinx");
+                    Info("Error en QUERY_REF de Sphinx de Agente " + getAID());
                     Info(in.getContent());
                     Info(Integer.toString(in.getPerformative()));
 
                     abortSession();
                 }
             } else {
-                Info("Error en SUBSCRIBE de Sphinx");
+                Info("Error en SUBSCRIBE de Sphinx de Agente " + getAID());
                 Info(in.getContent());
                 Info(Integer.toString(in.getPerformative()));
 
@@ -130,53 +111,42 @@ public class AgenteBase extends IntegratedAgent {
         }
     }
     
-    protected void loginWorldManager() {
-        Info("Login Controlador");
-        
-        out = new ACLMessage();
-        out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));       
-        out.setContent(new JsonObject().add("problem", "Playground1").toString());
-        out.setConversationId(myConvId);
-        out.setProtocol("ANALYTICS");
-        out.setPerformative(ACLMessage.SUBSCRIBE);
-        this.send(out);
-        
-        in = blockingReceive();
-        
-        if(in.getPerformative() != ACLMessage.INFORM) {
-            Info("Error en SUBSCRIBE de WM");
-            Info(in.getContent());
-            Info(Integer.toString(in.getPerformative()));
-
-            abortSession();
-        } else {
-            Info("SUBSCRIBE WM OK");
-        }
-    }
-    
+    protected abstract void loginWorldManager();  
     
     protected void logout() {
         Info("Requesting logout to " + _identitymanager);
         
-        out = new ACLMessage();
-        
-        out.setSender(getAID());
-        out.addReceiver(new AID(_identitymanager, AID.ISLOCALNAME));
-        out.setPerformative(ACLMessage.CANCEL);
-        out.setProtocol("ANALYTICS");
-        out.setContent("");
-        this.send(out);
+        enviarMensaje(_identitymanager, ACLMessage.CANCEL, "ANALYTICS", "", "", false);
         
         in = blockingReceive();
         
         if(in.getPerformative() != ACLMessage.INFORM) {
-            Info("Error en CANCEL de Sphinx");
+            Info("Error en CANCEL de Sphinx de Agente " + getAID());
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
             
             abortSession();
         } else {
-            Info("Logout OK");
+            Info("Logout OK de Agente " + getAID());
         }
+    }
+    
+    protected void enviarMensaje(String receiver, int performative, String protocol, String content, String conversationID, boolean cardID) {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+        out.setPerformative(performative);
+        out.setProtocol(protocol);
+        out.setContent(content);
+        
+        if(conversationID != "") {
+            out.setConversationId(conversationID);
+        }
+        
+        if(cardID) {
+            out.setEncoding(_myCardID.getCardID());
+        }
+        
+        this.send(out);
     }
 }

@@ -1,6 +1,7 @@
 package dragonfly_caixabank;
 
 import AppBoot.ConsoleBoot;
+import java.util.ArrayList;
 
 /**
  * Clase para ejecutar lanzar el agente
@@ -11,13 +12,24 @@ import AppBoot.ConsoleBoot;
  * @author Miguel Ángel Posadas Arráez
  */
 public class DRAGONFLY_CAIXABANK {
+    
+    protected static ArrayList<String> dronesSeeker = new ArrayList<>();
+    protected static ArrayList<String> dronesRescuer = new ArrayList<>();
+    protected static ArrayList<String> dronesListener = new ArrayList<>();
+    protected static String dronControlador = "CaixaBank_Controlador";
 
     public static void main(String[] args) {
+        dronesSeeker.add("CaixaBank_Seeker");
+        
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
         app.selectConnection();
         
-        app.launchAgent("CaixaBank_Controlador", Controlador.class);
-        app.launchAgent("CaixaBank_Seeker", AgenteBase.class);
+        app.launchAgent(dronControlador, Controlador.class);
+        
+        for(int i=0; i < dronesSeeker.size(); i++) {
+            app.launchAgent(dronesSeeker.get(i), Seeker.class);
+        }
+        
         app.shutDown();
     }
     
