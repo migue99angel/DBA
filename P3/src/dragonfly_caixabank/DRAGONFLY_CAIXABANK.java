@@ -17,12 +17,16 @@ public class DRAGONFLY_CAIXABANK {
     protected static ArrayList<String> dronesRescuer = new ArrayList<>();
     protected static ArrayList<String> dronesListener = new ArrayList<>();
     protected static String dronControlador = "CaixaBank_Controlador";
+    protected static String agenteAwacs = "Agente_Awacs";
 
     public static void main(String[] args) {
-        dronesSeeker.add("CaixaBank_Seeker");
+        dronesSeeker.add("CaixaBank_Seeker0");
+        dronesSeeker.add("CaixaBank_Seeker1");
         
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
         app.selectConnection();
+        
+        app.launchAgent(agenteAwacs, Awacs.class);
         
         app.launchAgent(dronControlador, Controlador.class);
         

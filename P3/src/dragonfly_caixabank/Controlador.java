@@ -2,6 +2,7 @@ package dragonfly_caixabank;
 
 import com.eclipsesource.json.JsonObject;
 import jade.lang.acl.ACLMessage;
+import java.util.ArrayList;
 
 
 public class Controlador extends AgenteBase {
@@ -23,6 +24,10 @@ public class Controlador extends AgenteBase {
         
         loginWorldManager();
         despertarAgentes();
+        autorizarCompra();
+        
+        // Autorizar la entrada al mundo
+        autorizarEntradaMundo();
         
         // Recibir la señal de cada agente y desloguearlos
         while(contador > 0) {
@@ -47,6 +52,9 @@ public class Controlador extends AgenteBase {
     
     protected void despertarAgentes() {
         Info("Controlador despertando a los agentes");
+        
+        // Despertando AWACS
+        enviarMensaje(DRAGONFLY_CAIXABANK.agenteAwacs, ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
         
         // Despertando a los Seeker
         for(int i=0; i < DRAGONFLY_CAIXABANK.dronesSeeker.size(); i++) {
@@ -94,6 +102,52 @@ public class Controlador extends AgenteBase {
             } else {
                 Info("Comunicación con Agente " + DRAGONFLY_CAIXABANK.dronesRescuer.get(i) + " confirmada");
             }
+        }
+    }
+    
+    protected void autorizarCompra() {
+        int contadorCopia = DRAGONFLY_CAIXABANK.dronesListener.size() + DRAGONFLY_CAIXABANK.dronesSeeker.size() +
+                DRAGONFLY_CAIXABANK.dronesRescuer.size();
+        ArrayList<String> ordenCompra = new ArrayList<>();
+        
+        while(contadorCopia > 0) {
+            in = new ACLMessage();
+            in = blockingReceive();
+            
+            if(in.getPerformative() != ACLMessage.INFORM) {
+                Info("No se ha podido procesar la petición de compra de " + in.getSender());
+                abortSession();
+            } else {
+                Info("Recibimos petición de compra de " + in.getSender());
+                contadorCopia--;
+                ordenCompra.add(in.getSender().getName().replace("@DBA", ""));
+            }
+        }
+        
+        for(int i=0; i < ordenCompra.size(); i++) {
+            enviarMensaje(ordenCompra.get(i), ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
+            
+            in = new ACLMessage();
+            in = blockingReceive();
+            
+            if(in.getPerformative() != ACLMessage.CONFIRM) {
+                Info("Agente " + in.getSender() + " no confirma la compra");
+                abortSession();
+            } else {
+                Info("Agente " + in.getSender() + " confirma la compra");
+            }
+        }
+    }
+    
+    protected void autorizarEntradaMundo() {
+        ArrayList<String> drones = new ArrayList<>();
+        drones.addAll(DRAGONFLY_CAIXABANK.dronesListener);
+        drones.addAll(DRAGONFLY_CAIXABANK.dronesSeeker);
+        drones.addAll(DRAGONFLY_CAIXABANK.dronesRescuer);
+        
+        for(int i=0; i < drones.size(); i++) {
+            Info("Autorizando entrada a mundo de " + drones.get(i));
+            enviarMensaje(drones.get(i), ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
         }
     }
     
