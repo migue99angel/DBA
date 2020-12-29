@@ -3,6 +3,7 @@ package dragonfly_caixabank;
 import ControlPanel.TTYControlPanel;
 import IntegratedAgent.IntegratedAgent;
 import YellowPages.YellowPages;
+import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
@@ -111,7 +112,7 @@ public abstract class AgenteBase extends IntegratedAgent {
         }
     }
     
-    protected abstract void loginWorldManager();  
+    protected abstract void loginWorldManager();
     
     protected void logout() {
         Info("Requesting logout to " + _identitymanager);

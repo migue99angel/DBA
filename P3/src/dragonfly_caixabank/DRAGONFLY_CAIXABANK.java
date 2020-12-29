@@ -1,6 +1,7 @@
 package dragonfly_caixabank;
 
 import AppBoot.ConsoleBoot;
+import com.eclipsesource.json.JsonArray;
 import java.util.ArrayList;
 
 /**
@@ -14,14 +15,23 @@ import java.util.ArrayList;
 public class DRAGONFLY_CAIXABANK {
     
     protected static ArrayList<String> dronesSeeker = new ArrayList<>();
+    protected static JsonArray posicionesSeeker = new JsonArray();
     protected static ArrayList<String> dronesRescuer = new ArrayList<>();
+    protected static JsonArray posicionesRescuer = new JsonArray();
     protected static ArrayList<String> dronesListener = new ArrayList<>();
     protected static String dronControlador = "CaixaBank_Controlador";
     protected static String agenteAwacs = "Agente_Awacs";
+    
+    //Los alemanes a rescatar por mundo
+    protected static final int alemanes = 10;
 
     public static void main(String[] args) {
         dronesSeeker.add("CaixaBank_Seeker0");
-        dronesSeeker.add("CaixaBank_Seeker1");
+        /*dronesSeeker.add("CaixaBank_Seeker1");
+        
+        dronesRescuer.add("CaixaBank_Rescuer0");
+        dronesRescuer.add("CaixaBank_Rescuer1");*/
+
         
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
         app.selectConnection();
@@ -32,6 +42,10 @@ public class DRAGONFLY_CAIXABANK {
         
         for(int i=0; i < dronesSeeker.size(); i++) {
             app.launchAgent(dronesSeeker.get(i), Seeker.class);
+        }
+        
+        for(int i=0; i < dronesRescuer.size(); i++) {
+            app.launchAgent(dronesRescuer.get(i), Rescuer.class);
         }
         
         app.shutDown();

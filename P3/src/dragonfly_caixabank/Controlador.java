@@ -1,5 +1,6 @@
 package dragonfly_caixabank;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 
 public class Controlador extends AgenteBase {
     private int contador = 0;
+    private int tamanioMundo = 0;
     
     @Override
     public void setup() {
@@ -168,6 +170,8 @@ public class Controlador extends AgenteBase {
         } else {
             Info("SUBSCRIBE WM OK de Agente " + getAID());
             myConvId = in.getConversationId();
+            Info("Ancho del mundo: " + Json.parse(in.getContent()).asObject().get("map").asObject().get("filedata").asArray().size());
+            //Info("Alto del mundo: " + Integer.toString(Json.parse(in.getContent()).asObject().get("map").asObject().get("filedata").asArray().size()));
         }
     }
     
