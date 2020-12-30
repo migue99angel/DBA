@@ -1,8 +1,11 @@
 package dragonfly_caixabank;
 
 import AppBoot.ConsoleBoot;
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Clase para ejecutar lanzar el agente
@@ -24,13 +27,17 @@ public class DRAGONFLY_CAIXABANK {
     
     //Los alemanes a rescatar por mundo
     protected static final int alemanes = 10;
+    protected static String _filename="Playground1";
 
     public static void main(String[] args) {
+        
         dronesSeeker.add("CaixaBank_Seeker0");
-        /*dronesSeeker.add("CaixaBank_Seeker1");
+        dronesSeeker.add("CaixaBank_Seeker1");
         
         dronesRescuer.add("CaixaBank_Rescuer0");
-        dronesRescuer.add("CaixaBank_Rescuer1");*/
+        dronesRescuer.add("CaixaBank_Rescuer1");
+        
+        dronesListener.add("CaixaBank_Listener0");
 
         
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
@@ -46,6 +53,10 @@ public class DRAGONFLY_CAIXABANK {
         
         for(int i=0; i < dronesRescuer.size(); i++) {
             app.launchAgent(dronesRescuer.get(i), Rescuer.class);
+        }
+        
+        for(int i=0; i < dronesListener.size(); i++) {
+            app.launchAgent(dronesListener.get(i), Listener.class);
         }
         
         app.shutDown();

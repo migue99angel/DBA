@@ -222,6 +222,9 @@ public abstract class Dron extends AgenteBase{
         if(in.getPerformative() != ACLMessage.CONFIRM) {
             Info("No se me ha concedido la entrada al mundo");
             abortSession();
+        } else{
+            posx = Json.parse(in.getContent()).asObject().get("posx").asInt();
+            posy = Json.parse(in.getContent()).asObject().get("posy").asInt();
         }
     }
     
@@ -229,8 +232,8 @@ public abstract class Dron extends AgenteBase{
         JsonObject content = new JsonObject();
         content.add("operation", "login");
         content.add("attach", mySensors);
-        content.add("posx", 0);
-        content.add("posy", 0);
+        content.add("posx", posx);
+        content.add("posy", posy);
         
         enviarMensaje(myWorldManager, ACLMessage.REQUEST, "REGULAR", content.toString(), myConvId, false);
         

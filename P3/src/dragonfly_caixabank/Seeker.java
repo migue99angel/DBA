@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public class Seeker extends Dron {
     protected static int alemanesDetectados = 0;
     protected JsonArray thermal = new JsonArray();
+    protected JsonArray ruta = new JsonArray();
+    protected int energy = 995;
     @Override
     public void setup() {
         super.setup();
@@ -29,19 +31,63 @@ public class Seeker extends Dron {
         //Recarga inicial
         recargar();
         
+        pedirRuta();
+        
         //Comportamiento general
-        while (Seeker.alemanesDetectados < DRAGONFLY_CAIXABANK.alemanes){
-            leerSensores();
-            
-            realizarSiguienteMovimiento();
-            
-            //Provisional
-            Seeker.alemanesDetectados = 10;
+        for (int i=0; i < ruta.size() && alemanesDetectados < DRAGONFLY_CAIXABANK.alemanes; i++){
+            Info(ruta.get(i).asObject().get("action").toString());
+            switch(ruta.get(i).asObject().get("action").asString()){
+                case "move":
+                    aux = new JsonObject();
+                    movimiento = ruta.get(i).asObject().get("value").asString();
+                    aux.add("operation", movimiento);
+                    enviarMensaje(myWorldManager, ACLMessage.REQUEST, "REGULAR", aux.toString(), myConvId, false);
+                    
+                    in = blockingReceive();
+                    if (in.getPerformative() != ACLMessage.INFORM){
+                        Info("Fallo al realizar " + movimiento);
+                        Info(Integer.toString(in.getPerformative()));
+                        Info(in.getContent());
+                        abortSession();
+                    }
+                    break;
+                case "read":
+                    leerSensores();
+                    break;
+                case "recharge":
+                    recargar();
+                    break;
+            }
         }
 
     }
     
-    public void leerSensores(){
+    protected void pedirRuta(){
+        Info("Pidiendo ruta");
+        JsonObject aux = new JsonObject();
+        aux.add("type",this.myValue);
+        aux.add("posx",this.posx);
+        aux.add("posy",this.posy);
+        aux.add("posz",this.posz);
+        aux.add("energy",this.energy);
+        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0),ACLMessage.REQUEST,"REGULAR",aux.toString(),myConvId,false);
+        
+        in = blockingReceive();
+        
+        //Gestionar la ruta
+        
+        if (in.getPerformative() != ACLMessage.INFORM){
+            Info("Error al recibir la ruta");
+            abortSession();
+        } else{
+            this.ruta = Json.parse(in.getContent()).asArray();
+            Info (in.getContent());
+            Info (Integer.toString(this.ruta.size()));
+            Info("Ruta recibida correctamente");
+        }
+    }
+    
+    protected void leerSensores(){
         JsonObject aux = new JsonObject();
         movimiento = "read";
         aux.add("operation", movimiento);
@@ -76,12 +122,5 @@ public class Seeker extends Dron {
         }
     }
     
-    public void realizarSiguienteMovimiento(){
-        for (int i=0; i<thermal.size(); i++){
-            for (int j=0; j<thermal.size(); j++){
-                
-            }
-        }
-    }
 
 }

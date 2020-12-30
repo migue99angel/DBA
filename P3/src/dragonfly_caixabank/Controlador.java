@@ -1,6 +1,7 @@
 package dragonfly_caixabank;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
@@ -8,15 +9,19 @@ import java.util.ArrayList;
 
 public class Controlador extends AgenteBase {
     private int contador = 0;
-    private int tamanioMundo = 0;
+    private int height = 0;
+    private int width = 0;
+    private final int radioThermal = 10;
+    private JsonArray posicionSeekers = new JsonArray();
+    private JsonArray posicionRescuers = new JsonArray();
     
     @Override
     public void setup() {
         super.setup();
         myAction = "problem";
-        myValue = "Playground1";
+        myValue = DRAGONFLY_CAIXABANK._filename;
         myWMProtocol = "ANALYTICS";
-        contador = DRAGONFLY_CAIXABANK.dronesListener.size() + DRAGONFLY_CAIXABANK.dronesSeeker.size() +
+        contador = DRAGONFLY_CAIXABANK.dronesSeeker.size() +
                 DRAGONFLY_CAIXABANK.dronesRescuer.size();
     }
     
@@ -25,9 +30,14 @@ public class Controlador extends AgenteBase {
         super.plainExecute();
         
         loginWorldManager();
+        
+        
+        
         despertarAgentes();
+        
         autorizarCompra();
         
+        calcularPosicionesIniciales();
         // Autorizar la entrada al mundo
         autorizarEntradaMundo();
         
@@ -44,6 +54,17 @@ public class Controlador extends AgenteBase {
                 contador--;
             }
         }
+        
+        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.CANCEL, "REGULAR", "", myConvId, false);
+        in = blockingReceive();
+        if(in.getPerformative() != ACLMessage.CONFIRM) {
+            Info("El agente " + in.getSender() + " no se ha podido desloguear correctamente");
+            abortSession();
+        } else {
+            Info("El agente " + in.getSender() + " avisa que se ha deslogueado");
+        }
+
+        
         
         // Cerrar la puerta
         logout();
@@ -87,6 +108,8 @@ public class Controlador extends AgenteBase {
                 abortSession();
             } else {
                 Info("Comunicación con Agente " + DRAGONFLY_CAIXABANK.dronesListener.get(i) + " confirmada");
+                height = Json.parse(in.getContent()).asObject().get("height").asInt();
+                width = Json.parse(in.getContent()).asObject().get("width").asInt();
             }
         }
         
@@ -108,7 +131,7 @@ public class Controlador extends AgenteBase {
     }
     
     protected void autorizarCompra() {
-        int contadorCopia = DRAGONFLY_CAIXABANK.dronesListener.size() + DRAGONFLY_CAIXABANK.dronesSeeker.size() +
+        int contadorCopia = DRAGONFLY_CAIXABANK.dronesSeeker.size() +
                 DRAGONFLY_CAIXABANK.dronesRescuer.size();
         ArrayList<String> ordenCompra = new ArrayList<>();
         
@@ -142,14 +165,14 @@ public class Controlador extends AgenteBase {
     }
     
     protected void autorizarEntradaMundo() {
-        ArrayList<String> drones = new ArrayList<>();
-        drones.addAll(DRAGONFLY_CAIXABANK.dronesListener);
-        drones.addAll(DRAGONFLY_CAIXABANK.dronesSeeker);
-        drones.addAll(DRAGONFLY_CAIXABANK.dronesRescuer);
         
-        for(int i=0; i < drones.size(); i++) {
-            Info("Autorizando entrada a mundo de " + drones.get(i));
-            enviarMensaje(drones.get(i), ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
+        for(int i=0; i < DRAGONFLY_CAIXABANK.dronesSeeker.size(); i++) {
+            Info("Autorizando entrada a mundo de " + DRAGONFLY_CAIXABANK.dronesSeeker.get(i));
+            enviarMensaje(DRAGONFLY_CAIXABANK.dronesSeeker.get(i), ACLMessage.CONFIRM, "REGULAR", posicionSeekers.get(i).toString(), myConvId, false);
+        }
+        for(int i=0; i < DRAGONFLY_CAIXABANK.dronesRescuer.size(); i++) {
+            Info("Autorizando entrada a mundo de " + DRAGONFLY_CAIXABANK.dronesRescuer.get(i));
+            enviarMensaje(DRAGONFLY_CAIXABANK.dronesRescuer.get(i), ACLMessage.CONFIRM, "REGULAR", posicionRescuers.get(i).toString(), myConvId, false);
         }
     }
     
@@ -170,9 +193,29 @@ public class Controlador extends AgenteBase {
         } else {
             Info("SUBSCRIBE WM OK de Agente " + getAID());
             myConvId = in.getConversationId();
-            Info("Ancho del mundo: " + Json.parse(in.getContent()).asObject().get("map").asObject().get("filedata").asArray().size());
-            //Info("Alto del mundo: " + Integer.toString(Json.parse(in.getContent()).asObject().get("map").asObject().get("filedata").asArray().size()));
         }
+    }
+    
+    protected void calcularPosicionesIniciales(){
+        JsonObject aux = new JsonObject();
+        aux.add("posx",0 + radioThermal);
+        aux.add("posy",0 + radioThermal);
+        posicionSeekers.add(aux);
+        
+        aux = new JsonObject();
+        aux.add("posx",(width/2) + radioThermal);
+        aux.add("posy",0 + radioThermal);
+        posicionSeekers.add(aux);
+        
+        aux = new JsonObject();
+        aux.add("posx",width/4);
+        aux.add("posy",height/2);
+        posicionRescuers.add(aux);
+        
+        aux = new JsonObject();
+        aux.add("posx",3 * (width/4));
+        aux.add("posy",height/2);
+        posicionRescuers.add(aux);
     }
     
     @Override
