@@ -25,6 +25,8 @@ public abstract class Dron extends AgenteBase{
     protected int posx = 0;
     protected int posy = 0;
     protected int posz = 0;
+    protected int orientacion = 90;
+    protected int cuadrante;
     protected String movimiento;
     
     @Override
@@ -223,6 +225,7 @@ public abstract class Dron extends AgenteBase{
             Info("No se me ha concedido la entrada al mundo");
             abortSession();
         } else{
+            cuadrante = Json.parse(in.getContent()).asObject().get("cuadrante").asInt();
             posx = Json.parse(in.getContent()).asObject().get("posx").asInt();
             posy = Json.parse(in.getContent()).asObject().get("posy").asInt();
         }

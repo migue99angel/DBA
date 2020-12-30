@@ -22,8 +22,8 @@ public class DRAGONFLY_CAIXABANK {
     protected static ArrayList<String> dronesRescuer = new ArrayList<>();
     protected static JsonArray posicionesRescuer = new JsonArray();
     protected static ArrayList<String> dronesListener = new ArrayList<>();
-    protected static String dronControlador = "CaixaBank_Controlador";
-    protected static String agenteAwacs = "Agente_Awacs";
+    protected static String dronControlador = "CaixaBank_Controlador_v2";
+    protected static String agenteAwacs = "Agente_Awacs_v2";
     
     //Los alemanes a rescatar por mundo
     protected static final int alemanes = 10;
@@ -31,7 +31,7 @@ public class DRAGONFLY_CAIXABANK {
 
     public static void main(String[] args) {
         
-        dronesSeeker.add("CaixaBank_Seeker0");
+        dronesSeeker.add("CaixaBank_Seeker0_v2");
         dronesSeeker.add("CaixaBank_Seeker1");
         
         dronesRescuer.add("CaixaBank_Rescuer0");

@@ -198,21 +198,25 @@ public class Controlador extends AgenteBase {
     
     protected void calcularPosicionesIniciales(){
         JsonObject aux = new JsonObject();
+        aux.add("cuadrante",0);
         aux.add("posx",0 + radioThermal);
         aux.add("posy",0 + radioThermal);
         posicionSeekers.add(aux);
         
         aux = new JsonObject();
+        aux.add("cuadrante",1);
         aux.add("posx",(width/2) + radioThermal);
         aux.add("posy",0 + radioThermal);
         posicionSeekers.add(aux);
         
         aux = new JsonObject();
+        aux.add("cuadrante",0);
         aux.add("posx",width/4);
         aux.add("posy",height/2);
         posicionRescuers.add(aux);
         
         aux = new JsonObject();
+        aux.add("cuadrante",1);
         aux.add("posx",3 * (width/4));
         aux.add("posy",height/2);
         posicionRescuers.add(aux);

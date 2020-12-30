@@ -36,7 +36,7 @@ public class Cartographer extends IntegratedAgent {
         myService = "Analytics group CaixaBank";
 
         // The world I am going to open
-        myWorld = "Playground2";
+        myWorld = "Playground1";
 
         // First state of the agent
         myStatus = "CHECKIN-LARVA";

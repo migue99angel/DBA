@@ -31,11 +31,13 @@ public class Seeker extends Dron {
         //Recarga inicial
         recargar();
         
+        leerSensores();
+        Info ("He leido sensores");
+        Info (posx + "," + posy + "," + posz + "");
         pedirRuta();
         
         //Comportamiento general
         for (int i=0; i < ruta.size() && alemanesDetectados < DRAGONFLY_CAIXABANK.alemanes; i++){
-            Info(ruta.get(i).asObject().get("action").toString());
             switch(ruta.get(i).asObject().get("action").asString()){
                 case "move":
                     aux = new JsonObject();
@@ -66,10 +68,12 @@ public class Seeker extends Dron {
         Info("Pidiendo ruta");
         JsonObject aux = new JsonObject();
         aux.add("type",this.myValue);
+        aux.add("cuadrante", this.cuadrante);
         aux.add("posx",this.posx);
         aux.add("posy",this.posy);
         aux.add("posz",this.posz);
         aux.add("energy",this.energy);
+        aux.add("orientacion",this.orientacion);
         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0),ACLMessage.REQUEST,"REGULAR",aux.toString(),myConvId,false);
         
         in = blockingReceive();
@@ -113,6 +117,8 @@ public class Seeker extends Dron {
                         this.thermal = arrayAux.get(i).asObject().get("data").asArray();
                         break;
                     case "gps":
+                        Info("Lectura GPS");
+                        Info(arrayAux.get(i).asObject().get("data").toString());
                         this.posx = arrayAux.get(i).asObject().get("data").asArray().get(0).asArray().get(0).asInt();
                         this.posy = arrayAux.get(i).asObject().get("data").asArray().get(0).asArray().get(1).asInt();
                         this.posz = arrayAux.get(i).asObject().get("data").asArray().get(0).asArray().get(2).asInt();
