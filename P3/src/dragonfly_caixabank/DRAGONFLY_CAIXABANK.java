@@ -31,11 +31,11 @@ public class DRAGONFLY_CAIXABANK {
 
     public static void main(String[] args) {
         
-        dronesSeeker.add("CaixaBank_Seeker0_v2");
-        dronesSeeker.add("CaixaBank_Seeker1");
+        dronesSeeker.add("CaixaBank_Seeker0");
+        /*dronesSeeker.add("CaixaBank_Seeker1");*/
         
         dronesRescuer.add("CaixaBank_Rescuer0");
-        dronesRescuer.add("CaixaBank_Rescuer1");
+        /*dronesRescuer.add("CaixaBank_Rescuer1");*/
         
         dronesListener.add("CaixaBank_Listener0");
 

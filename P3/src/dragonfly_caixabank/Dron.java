@@ -25,6 +25,8 @@ public abstract class Dron extends AgenteBase{
     protected int posx = 0;
     protected int posy = 0;
     protected int posz = 0;
+    protected int posInix = 0;
+    protected int posIniy = 0;
     protected int orientacion = 90;
     protected int cuadrante;
     protected String movimiento;
@@ -225,9 +227,11 @@ public abstract class Dron extends AgenteBase{
             Info("No se me ha concedido la entrada al mundo");
             abortSession();
         } else{
-            cuadrante = Json.parse(in.getContent()).asObject().get("cuadrante").asInt();
-            posx = Json.parse(in.getContent()).asObject().get("posx").asInt();
-            posy = Json.parse(in.getContent()).asObject().get("posy").asInt();
+            this.cuadrante = Json.parse(in.getContent()).asObject().get("cuadrante").asInt();
+            this.posx = Json.parse(in.getContent()).asObject().get("posx").asInt();
+            this.posy = Json.parse(in.getContent()).asObject().get("posy").asInt();
+            this.posInix = posx;
+            this.posIniy = posy;
         }
     }
     
@@ -301,7 +305,69 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
-    protected abstract void leerSensores();
+    protected void seguirRuta(JsonArray ruta, int condicionParada) {
+        JsonObject aux = new JsonObject();
+        
+        for (int i=0; i < ruta.size() && condicionParada < DRAGONFLY_CAIXABANK.alemanes; i++){
+            switch(ruta.get(i).asObject().get("action").asString()){
+                case "move":
+                    aux = new JsonObject();
+                    movimiento = ruta.get(i).asObject().get("value").asString();
+                    aux.add("operation", movimiento);
+                    enviarMensaje(myWorldManager, ACLMessage.REQUEST, "REGULAR", aux.toString(), myConvId, false);
+                    
+                    in = blockingReceive();
+                    
+                    if (in.getPerformative() != ACLMessage.INFORM){
+                        Info("Fallo al realizar " + movimiento);
+                        Info(Integer.toString(in.getPerformative()));
+                        Info(in.getContent());
+                        abortSession();
+                    }
+                    
+                    break;
+                    
+                case "read":
+                    leerSensores();
+                    
+                    break;
+                    
+                case "recharge":
+                    recargar();
+                    
+                    break;
+            }
+        }
+    }
+    
+    protected void leerSensores(){
+        JsonObject aux = new JsonObject();
+        movimiento = "read";
+        aux.add("operation", movimiento);
+        enviarMensaje(myWorldManager, ACLMessage.QUERY_REF, "REGULAR", aux.toString(), myConvId, false);
+        
+        in = blockingReceive();
+        
+        if (in.getPerformative() != ACLMessage.INFORM){
+            Info("Fallo al realizar " + movimiento);
+            Info(in.toString());
+            Info(Integer.toString(in.getPerformative()));
+            Info(in.getContent());
+            abortSession();
+        } else {
+            Info("Lectura de sensores realizada con exito");
+            Info(in.getContent()); 
+            JsonArray arrayAux = new JsonArray();
+            arrayAux = Json.parse(in.getContent()).asObject().get("details").asObject().get("perceptions").asArray();
+        
+            for(int i = 0; i < arrayAux.size(); i++ )
+            {
+                lecturaSensoresConcretos(arrayAux.get(i).asObject());
+            }
+        }
+    }
+    
+    protected abstract void lecturaSensoresConcretos(JsonObject o);
     
     protected abstract void comportamiento();
 }

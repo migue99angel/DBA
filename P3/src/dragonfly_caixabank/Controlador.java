@@ -30,14 +30,13 @@ public class Controlador extends AgenteBase {
         super.plainExecute();
         
         loginWorldManager();
-        
-        
-        
+
         despertarAgentes();
         
         autorizarCompra();
         
         calcularPosicionesIniciales();
+        
         // Autorizar la entrada al mundo
         autorizarEntradaMundo();
         
@@ -64,8 +63,6 @@ public class Controlador extends AgenteBase {
             Info("El agente " + in.getSender() + " avisa que se ha deslogueado");
         }
 
-        
-        
         // Cerrar la puerta
         logout();
         
