@@ -19,7 +19,6 @@ public class Rescuer extends Dron {
     protected boolean escuchando = true;
     protected int energy = 995;
     protected int altimeter;
-    protected int orientacion = 45;
     
     @Override
     public void setup() {
@@ -53,8 +52,8 @@ public class Rescuer extends Dron {
                 case ACLMessage.QUERY_IF:
                     
                     aux = new JsonObject();
-                    aux.add("posx", this.posInix);
-                    aux.add("posy", this.posIniy);
+                    aux.add("posx", this.posx);
+                    aux.add("posy", this.posy);
                     aux.add("energy", this.energy);
                     aux.add("altimeter", this.altimeter);
                     aux.add("orientacion", this.orientacion);
@@ -70,6 +69,8 @@ public class Rescuer extends Dron {
                     Info("Ruta recibida correctamente");
                     
                     seguirRuta(ruta, Rescuer.alemanesEncontrados);
+                    
+                    Info("Aleman rescatado correctamente");
                     
                     Rescuer.alemanesEncontrados++;
                     leerSensores();

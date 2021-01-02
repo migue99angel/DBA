@@ -90,6 +90,7 @@ public class Seeker extends Dron {
                     aleman_posy = j - posFijaY + this.posy;
                     
                     Info("Alemán encontrado en posición del mundo " + aleman_posx + "," + aleman_posy);
+                    Info("La posicion del dron es: " + posx + "," + posy);
                     
                     posicion.add("posx", aleman_posx);
                     posicion.add("posy", aleman_posy);
