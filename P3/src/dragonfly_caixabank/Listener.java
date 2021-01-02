@@ -19,7 +19,13 @@ public class Listener extends AgenteBase{
     
     protected static DBAMap mapa;
     protected boolean listening;
-    protected ArrayList<JsonObject> alemanesEncontrados = new ArrayList<>();
+    protected ArrayList<JsonObject> alemanesEncontradosPrimerCuadrante = new ArrayList<>();
+    protected ArrayList<JsonObject> alemanesEncontradosSegundoCuadrante = new ArrayList<>();
+    protected Boolean rescuerOcupadoPrimerCuadrante = true;
+    protected Boolean rescuerOcupadoSegundoCuadrante = true;
+    protected JsonObject estadoRescuer0 = new JsonObject();
+    
+    protected JsonObject estadoRescuer1 = new JsonObject();
     
     @Override
     public void setup() {
@@ -99,7 +105,6 @@ public class Listener extends AgenteBase{
     protected void comportamiento() {
         JsonObject aux = new JsonObject();
         JsonArray ruta = new JsonArray();
-        int posIniXRescuer = -1, posIniYRescuer = -1, energiaRescuer = -1, cuadrante = -1;
         
         Info("Listener escuchando mensajes");
         
@@ -120,45 +125,97 @@ public class Listener extends AgenteBase{
                     }
                     
                     enviarMensaje(in.getSender().getName().replace("@DBA", ""), ACLMessage.INFORM, "REGULAR", ruta.toString(), myConvId, false);
+                    ruta = new JsonArray();
                     break;
+                //Query_Ref
                 case ACLMessage.QUERY_REF:
+                    
                     aux = Json.parse(in.getContent()).asObject();
                     
                     JsonObject aleman = new JsonObject();
                     aleman.add("posx", aux.get("posx").asInt());
                     aleman.add("posy", aux.get("posy").asInt());
+                    Boolean aniadido = false;
                     
-                    if(this.alemanesEncontrados.indexOf(aleman) == -1) {
-                        alemanesEncontrados.add(aleman);
-                        
-                        Info("Nuevo alemán encontrado");
-                        
-                        String rescuerALlamar = DRAGONFLY_CAIXABANK.dronesRescuer.get(aux.get("cuadrante").asInt());
-                        
-                        enviarMensaje(rescuerALlamar, ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
-                        
-                        // Confirmamos al seeker
+                    if(this.alemanesEncontradosPrimerCuadrante.indexOf(aleman) == -1 && aux.get("cuadrante").asInt() == 0) {
+                        alemanesEncontradosPrimerCuadrante.add(aleman);
+                        aniadido = true;
+                    } else if (this.alemanesEncontradosSegundoCuadrante.indexOf(aleman) == -1 && aux.get("cuadrante").asInt() == 1){
+                        alemanesEncontradosSegundoCuadrante.add(aleman);
+                        aniadido = true;
+                    } else {
+                        Info("Aleman ya localizado");
+                    }
+                    
+                    // Confirmamos al seeker
+                    if (aniadido){
                         enviarMensaje(in.getSender().getName().replace("@DBA", ""), ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
                     } else {
                         enviarMensaje(in.getSender().getName().replace("@DBA", ""), ACLMessage.DISCONFIRM, "REGULAR", "", myConvId, false);
                     }
                     
                     break;
-
+                //Agree
                 case ACLMessage.AGREE:
-                    aux = Json.parse(in.getContent()).asObject();
-                    posIniXRescuer = Json.parse(in.getContent()).asObject().get("posx").asInt();
-                    posIniYRescuer = Json.parse(in.getContent()).asObject().get("posy").asInt();
-                    energiaRescuer = Json.parse(in.getContent()).asObject().get("energy").asInt();
-                    cuadrante = Json.parse(in.getContent()).asObject().get("cuadrante").asInt();
-                    
-                    ruta = calcularRutaRescuer(posIniXRescuer, posIniYRescuer, aux.get("posx").asInt(), aux.get("posy").asInt(), energiaRescuer, aux.get("altimeter").asInt(), aux.get("orientacion").asInt());
-                    
-                    // Notificamos al rescuer
-                    enviarMensaje(DRAGONFLY_CAIXABANK.dronesRescuer.get(cuadrante), ACLMessage.QUERY_REF, "REGULAR", ruta.toString(), myConvId, false);
+                    if (in.getSender().getName().replace("@DBA", "").contains(DRAGONFLY_CAIXABANK.dronesRescuer.get(0))){
+                        this.estadoRescuer0 = new JsonObject();
+                        this.estadoRescuer0.add("posx", Json.parse(in.getContent()).asObject().get("posx").asInt());
+                        this.estadoRescuer0.add("posy", Json.parse(in.getContent()).asObject().get("posy").asInt());
+                        this.estadoRescuer0.add("energy", Json.parse(in.getContent()).asObject().get("energy").asInt());
+                        this.estadoRescuer0.add("cuadrante", Json.parse(in.getContent()).asObject().get("cuadrante").asInt());
+                        this.estadoRescuer0.add("altimeter", Json.parse(in.getContent()).asObject().get("altimeter").asInt());
+                        this.estadoRescuer0.add("orientacion", Json.parse(in.getContent()).asObject().get("orientacion").asInt());
+                    } else if (in.getSender().getName().replace("@DBA", "").contains(DRAGONFLY_CAIXABANK.dronesRescuer.get(1))) {
+                        this.estadoRescuer1 = new JsonObject();
+                        this.estadoRescuer1.add("posx", Json.parse(in.getContent()).asObject().get("posx").asInt());
+                        this.estadoRescuer1.add("posy", Json.parse(in.getContent()).asObject().get("posy").asInt());
+                        this.estadoRescuer1.add("energy", Json.parse(in.getContent()).asObject().get("energy").asInt());
+                        this.estadoRescuer1.add("cuadrante", Json.parse(in.getContent()).asObject().get("cuadrante").asInt());
+                        this.estadoRescuer1.add("altimeter", Json.parse(in.getContent()).asObject().get("altimeter").asInt());
+                        this.estadoRescuer1.add("orientacion", Json.parse(in.getContent()).asObject().get("orientacion").asInt());
+                    }
                     
                     break;
+                 
+                //Agree
+                case ACLMessage.INFORM:
+                    if (in.getSender().getName().replace("@DBA", "").contains(DRAGONFLY_CAIXABANK.dronesRescuer.get(0))) {
+                        rescuerOcupadoPrimerCuadrante = false;
+                        String rescuerALlamar = DRAGONFLY_CAIXABANK.dronesRescuer.get(0);
+                        enviarMensaje(rescuerALlamar, ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
+                    } else if (in.getSender().getName().replace("@DBA", "").contains(DRAGONFLY_CAIXABANK.dronesRescuer.get(1))) {
+                        rescuerOcupadoSegundoCuadrante = false;
+                        String rescuerALlamar = DRAGONFLY_CAIXABANK.dronesRescuer.get(1);
+                        enviarMensaje(rescuerALlamar, ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
+                    }
+                    break;
 
+            }
+            Info(Boolean.toString(!this.alemanesEncontradosPrimerCuadrante.isEmpty()));
+            Info(Boolean.toString(!this.rescuerOcupadoPrimerCuadrante));
+            Info(Boolean.toString(!this.estadoRescuer0.isEmpty()));
+            if (!this.alemanesEncontradosPrimerCuadrante.isEmpty() && !this.rescuerOcupadoPrimerCuadrante && !this.estadoRescuer0.isEmpty()){
+                ruta = calcularRutaRescuer(this.estadoRescuer0.get("posx").asInt(), this.estadoRescuer0.get("posy").asInt(), this.alemanesEncontradosPrimerCuadrante.get(0).asObject().get("posx").asInt(),
+                        this.alemanesEncontradosPrimerCuadrante.get(0).asObject().get("posy").asInt(), this.estadoRescuer0.get("energy").asInt(), this.estadoRescuer0.get("altimeter").asInt(), this.estadoRescuer0.get("orientacion").asInt());    
+                // Notificamos al rescuer
+                enviarMensaje(DRAGONFLY_CAIXABANK.dronesRescuer.get(this.estadoRescuer0.get("cuadrante").asInt()), ACLMessage.QUERY_REF, "REGULAR", ruta.toString(), myConvId, false);
+                
+                this.alemanesEncontradosPrimerCuadrante.remove(0);
+                this.rescuerOcupadoPrimerCuadrante = true;
+                this.estadoRescuer0 = new JsonObject();
+                ruta = new JsonArray();
+                
+            } else if (!this.alemanesEncontradosSegundoCuadrante.isEmpty() && !this.rescuerOcupadoSegundoCuadrante && !this.estadoRescuer1.isEmpty()){
+                Info ("Calculando ruta para el rescuer del segundo cuadrante");
+                ruta = calcularRutaRescuer(this.estadoRescuer1.get("posx").asInt(), this.estadoRescuer1.get("posy").asInt(), this.alemanesEncontradosSegundoCuadrante.get(0).get("posx").asInt(),
+                        this.alemanesEncontradosSegundoCuadrante.get(0).get("posy").asInt(), this.estadoRescuer1.get("energy").asInt(), this.estadoRescuer1.get("altimeter").asInt(), this.estadoRescuer1.get("orientacion").asInt());    
+                // Notificamos al rescuer
+                enviarMensaje(DRAGONFLY_CAIXABANK.dronesRescuer.get(this.estadoRescuer1.get("cuadrante").asInt()), ACLMessage.QUERY_REF, "REGULAR", ruta.toString(), myConvId, false);
+                
+                this.alemanesEncontradosSegundoCuadrante.remove(0);
+                this.rescuerOcupadoSegundoCuadrante = true;
+                this.estadoRescuer1 = new JsonObject();
+                ruta = new JsonArray();
             }
         }
     }
@@ -344,87 +401,86 @@ public class Listener extends AgenteBase{
         JsonObject aux = new JsonObject();
         
         altura += mapa.getLevel(posIniX, posIniY);
-        
+            
+        if(posIniX < posDestinoX) {
+            while(orientacion != 90) {
+                aux = new JsonObject();
+
+                if(orientacion < 90) {                       
+                    aux.add("action", "move");
+                    aux.add("value", "rotateR");
+                    orientacion += 45;
+                } else if(orientacion > 90) {
+                    aux.add("action", "move");
+                    aux.add("value", "rotateL");
+                    orientacion -= 45;
+                }
+
+                energy -= 4;
+                ruta.add(aux);
+            }
+        } else if(posIniX > posDestinoX) {
+            while(orientacion != -90) {
+                aux = new JsonObject();
+
+                if(orientacion < -90) {                       
+                    aux.add("action", "move");
+                    aux.add("value", "rotateR");
+                    orientacion += 45;
+                } else if(orientacion > -90) {
+                    aux.add("action", "move");
+                    aux.add("value", "rotateL");
+                    orientacion -= 45;
+                }
+
+                energy -= 4;
+                ruta.add(aux);
+            }
+        }
+                
         while(posIniX != posDestinoX) {
-            
-            if(posIniX < posDestinoX) {
-                while(orientacion != 90) {
+            Info(posIniX + " != " + posDestinoX);
+            if(orientacion == 90) {
+                while (mapa.getLevel(posIniX+1, posIniY) > altura){
                     aux = new JsonObject();
-                    
-                    if(orientacion < 90) {                       
-                        aux.add("action", "move");
-                        aux.add("value", "rotateR");
-                        orientacion += 45;
-                    } else if(orientacion > 90) {
-                        aux.add("action", "move");
-                        aux.add("value", "rotateL");
-                        orientacion -= 45;
-                    }
-                    
-                    energy -= 4;
+                    aux.add("action", "move");
+                    aux.add("value", "moveUP");
                     ruta.add(aux);
+                    energy -= 20;
+                    altura += 5;
                 }
-            } else if(posIniX > posDestinoX) {
-                while(orientacion != -90) {
+            } else {
+                while (mapa.getLevel(posIniX-1, posIniY) > altura){
                     aux = new JsonObject();
-                    
-                    if(orientacion < -90) {                       
-                        aux.add("action", "move");
-                        aux.add("value", "rotateR");
-                        orientacion += 45;
-                    } else if(orientacion > -90) {
-                        aux.add("action", "move");
-                        aux.add("value", "rotateL");
-                        orientacion -= 45;
-                    }
-                    
-                    energy -= 4;
+                    aux.add("action", "move");
+                    aux.add("value", "moveUP");
                     ruta.add(aux);
+                    energy -= 20;
+                    altura += 5;
                 }
-            }
-                
-            while(posIniX != posDestinoX) {
-                if(orientacion == 90) {
-                    while (mapa.getLevel(posIniX+1, posIniY) > altura){
-                        aux = new JsonObject();
-                        aux.add("action", "move");
-                        aux.add("value", "moveUP");
-                        ruta.add(aux);
-                        energy -= 20;
-                        altura += 5;
-                    }
-                } else {
-                    while (mapa.getLevel(posIniX-1, posIniY) > altura){
-                        aux = new JsonObject();
-                        aux.add("action", "move");
-                        aux.add("value", "moveUP");
-                        ruta.add(aux);
-                        energy -= 20;
-                        altura += 5;
-                    }
-                }               
+            }               
 
-                aux = new JsonObject();
-                aux.add("action", "move");
-                aux.add("value", "moveF");
-                
-                if(orientacion == 90) {
-                    posIniX++;
-                } else {
-                    posIniX--;
-                }
-                
-                energy -= 4;
-                ruta.add(aux);
+            aux = new JsonObject();
+            aux.add("action", "move");
+            aux.add("value", "moveF");
+
+            if(orientacion == 90) {
+                posIniX++;
+            } else {
+                posIniX--;
             }
+
+            energy -= 4;
+            ruta.add(aux);
             
             // @todo Calcular cuándo es necesario recargar            
             if(energy < 200) {
                 aux = new JsonObject();
                 
-                while(altura > 0) {                   
+                while(altura > mapa.getLevel(posIniX, posIniY)) {                   
                     aux.add("action", "move");
                     aux.add("value", "moveD");
+                    altura -= 5;
                     ruta.add(aux);
                     
                     aux = new JsonObject();
@@ -437,87 +493,81 @@ public class Listener extends AgenteBase{
                 ruta.add(aux);
             }
         }
-        
+            
+
+        if(posIniY < posDestinoY) {
+            while(orientacion != 180) {
+                aux = new JsonObject();
+                   
+                aux.add("action", "move");
+                aux.add("value", "rotateR");
+                orientacion += 45;
+
+                energy -= 4;
+                ruta.add(aux);
+            }
+        } else if(posIniY > posDestinoY) {
+            while(orientacion != 0) {
+                aux = new JsonObject();
+
+                if(orientacion < 0) {                       
+                    aux.add("action", "move");
+                    aux.add("value", "rotateR");
+                    orientacion += 45;
+                } else if(orientacion > 0) {
+                    aux.add("action", "move");
+                    aux.add("value", "rotateL");
+                    orientacion -= 45;
+                }
+
+                energy -= 4;
+                ruta.add(aux);
+            }
+        }
+                
         while(posIniY != posDestinoY) {
-            
-            if(posIniY < posDestinoY) {
-                while(orientacion != 90) {
+            Info(posIniY + " != " + posDestinoY);
+            if(orientacion == 180) {
+                while (mapa.getLevel(posIniX, posIniY+1) > altura){
                     aux = new JsonObject();
-                    
-                    if(orientacion < 90) {                       
-                        aux.add("action", "move");
-                        aux.add("value", "rotateR");
-                        orientacion += 45;
-                    } else if(orientacion > 90) {
-                        aux.add("action", "move");
-                        aux.add("value", "rotateL");
-                        orientacion -= 45;
-                    }
-                    
-                    energy -= 4;
+                    aux.add("action", "move");
+                    aux.add("value", "moveUP");
                     ruta.add(aux);
+                    energy -= 20;
+                    altura += 5;
                 }
-            } else if(posIniY > posDestinoY) {
-                while(orientacion != -90) {
+            } else {
+                while (mapa.getLevel(posIniX, posIniY-1) > altura){
                     aux = new JsonObject();
-                    
-                    if(orientacion < -90) {                       
-                        aux.add("action", "move");
-                        aux.add("value", "rotateR");
-                        orientacion += 45;
-                    } else if(orientacion > -90) {
-                        aux.add("action", "move");
-                        aux.add("value", "rotateL");
-                        orientacion -= 45;
-                    }
-                    
-                    energy -= 4;
+                    aux.add("action", "move");
+                    aux.add("value", "moveUP");
                     ruta.add(aux);
+                    energy -= 20;
+                    altura += 5;
                 }
-            }
-                
-            while(posIniY != posDestinoY) {
-                if(orientacion == 90) {
-                    while (mapa.getLevel(posIniX+1, posIniY) > altura){
-                        aux = new JsonObject();
-                        aux.add("action", "move");
-                        aux.add("value", "moveUP");
-                        ruta.add(aux);
-                        energy -= 20;
-                        altura += 5;
-                    }
-                } else {
-                    while (mapa.getLevel(posIniX-1, posIniY) > altura){
-                        aux = new JsonObject();
-                        aux.add("action", "move");
-                        aux.add("value", "moveUP");
-                        ruta.add(aux);
-                        energy -= 20;
-                        altura += 5;
-                    }
-                }               
+            }               
 
-                aux = new JsonObject();
-                aux.add("action", "move");
-                aux.add("value", "moveF");
-                
-                if(orientacion == 90) {
-                    posIniY++;
-                } else {
-                    posIniY--;
-                }
-                
-                energy -= 4;
-                ruta.add(aux);
+            aux = new JsonObject();
+            aux.add("action", "move");
+            aux.add("value", "moveF");
+
+            if(orientacion == 180) {
+                posIniY++;
+            } else {
+                posIniY--;
             }
+
+            energy -= 4;
+            ruta.add(aux);
             
             // @todo Calcular cuándo es necesario recargar            
             if(energy < 200) {
                 aux = new JsonObject();
                 
-                while(altura > 0) {                   
+                while(altura > mapa.getLevel(posIniX, posIniY)) {                   
                     aux.add("action", "move");
                     aux.add("value", "moveD");
+                    altura -= 5;
                     ruta.add(aux);
                     
                     aux = new JsonObject();
@@ -531,10 +581,11 @@ public class Listener extends AgenteBase{
             }
         }
         
-        while(mapa.getLevel(posIniX, posIniY) > 0) {
+        while(altura > mapa.getLevel(posIniX, posIniY)) {
             aux = new JsonObject();
             aux.add("action", "move");
             aux.add("value", "moveD");
+            altura -= 5;
             ruta.add(aux);
         }
  

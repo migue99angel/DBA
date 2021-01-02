@@ -42,9 +42,11 @@ public class Rescuer extends Dron {
         
         //Recarga inicial
         recargar();
+        leerSensores();
+        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
         
         while(escuchando) {
-            leerSensores();
+            Info ("Escuchando mensajes");
             in = blockingReceive();
             
             switch(in.getPerformative()) {
@@ -57,7 +59,7 @@ public class Rescuer extends Dron {
                     aux.add("altimeter", this.altimeter);
                     aux.add("orientacion", this.orientacion);
                     aux.add("cuadrante", this.cuadrante);
-                    
+                    Info ("Enviando mi posicion al listener");
                     enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
                     break;
                     
@@ -70,6 +72,8 @@ public class Rescuer extends Dron {
                     seguirRuta(ruta, Rescuer.alemanesEncontrados);
                     
                     Rescuer.alemanesEncontrados++;
+                    leerSensores();
+                    enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
                     
                     if(DRAGONFLY_CAIXABANK.alemanes == Rescuer.alemanesEncontrados) {
                         escuchando = false;
