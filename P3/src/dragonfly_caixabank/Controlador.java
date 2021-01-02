@@ -9,20 +9,27 @@ import java.util.ArrayList;
 
 public class Controlador extends AgenteBase {
     private int contador = 0;
+    private int alemanesRescatados = 0;
     private int height = 0;
     private int width = 0;
     private final int radioThermal = 10;
     private JsonArray posicionSeekers = new JsonArray();
     private JsonArray posicionRescuers = new JsonArray();
+    private ArrayList<ACLMessage> mensajesRecibidos = new ArrayList<>();
     
     @Override
     public void setup() {
         super.setup();
+        
+        alemanesRescatados = 10;
+        
         myAction = "problem";
         myValue = DRAGONFLY_CAIXABANK._filename;
         myWMProtocol = "ANALYTICS";
         contador = DRAGONFLY_CAIXABANK.dronesSeeker.size() +
                 DRAGONFLY_CAIXABANK.dronesRescuer.size();
+        
+        mensajesRecibidos = new ArrayList<>();
     }
     
     @Override
@@ -39,6 +46,46 @@ public class Controlador extends AgenteBase {
         
         // Autorizar la entrada al mundo
         autorizarEntradaMundo();
+        
+        while (alemanesRescatados < DRAGONFLY_CAIXABANK.alemanes) {
+            String agenteConversacion = "";
+            
+            if (!mensajesRecibidos.isEmpty()) {
+                in = mensajesRecibidos.get(0);
+                mensajesRecibidos.remove(0);
+            }
+            else {
+                in = new ACLMessage();
+                in = blockingReceive(2000);
+            }
+            
+            if (in.getSender() != null) {
+                switch(in.getPerformative()) {
+                    case ACLMessage.INFORM:
+                        agenteConversacion = in.getSender().getName();
+                        Info("El agente " + agenteConversacion + " solicita comprar una recarga");
+                        enviarMensaje(agenteConversacion, ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
+                        Info("Confirmamos la peticición de compra de recarga al agente " + agenteConversacion);
+                        Info("Esperando la confirmación de compra de recarga del agente " + agenteConversacion);
+                        do {
+                            in = new ACLMessage();
+                            in = blockingReceive();
+
+                            if (in.getPerformative() == ACLMessage.CONFIRM && in.getSender().getName().equals(agenteConversacion)) {
+                                Info("El agente " + agenteConversacion + " ha confirmado la compra de recarga");
+                            }
+                            else {
+                                mensajesRecibidos.add(in);
+                                Info("Mensaje no esperado archivado en la cola de mensajes");
+                            }
+                        } while (!in.getSender().getName().equals(agenteConversacion));
+                        break;
+                    default:
+                        Info("No puedo manejar el mensaje recibido " + in.getContent());
+                        break;
+                }
+            }
+        }
         
         // Recibir la señal de cada agente y desloguearlos
         while(contador > 0) {

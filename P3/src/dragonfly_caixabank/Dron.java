@@ -283,12 +283,15 @@ public abstract class Dron extends AgenteBase{
         movimiento = "recharge";
         aux.add("operation", movimiento);
         
-        if (!myRechargeTickets.isEmpty()){
-            aux.add("recharge", myRechargeTickets.get(0));
-            myRechargeTickets.remove(0);
-        } else{
-            //Falta la operacion de comprar tickets
+        if (myRechargeTickets.isEmpty()) {
+        
+            sensoresRequeridos.clear();
+            sensoresRequeridos.add("CHARGE");
+            this.hacerCompras();
         }
+        
+        aux.add("recharge", myRechargeTickets.get(0));
+        myRechargeTickets.remove(0);
         
         enviarMensaje(myWorldManager, ACLMessage.REQUEST, "REGULAR", aux.toString(), myConvId, false);
         in = blockingReceive();
