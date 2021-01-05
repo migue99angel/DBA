@@ -42,7 +42,7 @@ public class Seeker extends Dron {
         pedirRuta();
         
         //Comportamiento general      
-        seguirRuta(ruta, Seeker.alemanesDetectados);
+        seguirRuta(ruta);
 
     }
     
@@ -83,11 +83,14 @@ public class Seeker extends Dron {
         // El dron está en la posición central de la matriz [10,10]
         int posFijaX = 10, posFijaY = 10;
         
-        for(int i=0; i < this.thermal.size(); i++) {           
+        for(int i=0; i < this.thermal.size(); i++) {   
             for(int j=0; j < this.thermal.get(i).asArray().size(); j++) {
-                if(this.thermal.get(i).asArray().get(j).asFloat() == 0.0) {
-                    aleman_posx = i - posFijaX + this.posx;
-                    aleman_posy = j - posFijaY + this.posy;
+                if(this.thermal.get(i).asArray().get(j).asFloat() == 0.00f) {
+                    
+                    //IMPORTANTE | ESTO ESTA AL REVES PORQUE LO LEIAMOS AL REVES, MIRARLO LUEGO
+                    
+                    aleman_posx = j - posFijaX + this.posx;
+                    aleman_posy = i - posFijaY + this.posy;
                     
                     Info("Alemán encontrado en posición del mundo " + aleman_posx + "," + aleman_posy);
                     Info("La posicion del dron es: " + posx + "," + posy);

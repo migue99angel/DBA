@@ -308,10 +308,10 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
-    protected void seguirRuta(JsonArray ruta, int condicionParada) {
+    protected void seguirRuta(JsonArray ruta) {
         JsonObject aux = new JsonObject();
         
-        for (int i=0; i < ruta.size() && condicionParada < DRAGONFLY_CAIXABANK.alemanes; i++){
+        for (int i=0; i < ruta.size(); i++){
             switch(ruta.get(i).asObject().get("action").asString()){
                 case "move":
                     aux = new JsonObject();
@@ -327,9 +327,7 @@ public abstract class Dron extends AgenteBase{
                         Info(in.getContent());
                         abortSession();
                     }
-                    
                     break;
-                    
                 case "read":
                     leerSensores();
                     

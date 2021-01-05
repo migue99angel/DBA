@@ -21,8 +21,6 @@ public class Controlador extends AgenteBase {
     public void setup() {
         super.setup();
         
-        alemanesRescatados = 10;
-        
         myAction = "problem";
         myValue = DRAGONFLY_CAIXABANK._filename;
         myWMProtocol = "ANALYTICS";
@@ -47,7 +45,7 @@ public class Controlador extends AgenteBase {
         // Autorizar la entrada al mundo
         autorizarEntradaMundo();
         
-        while (alemanesRescatados < DRAGONFLY_CAIXABANK.alemanes) {
+        while (Rescuer.alemanesEncontrados < DRAGONFLY_CAIXABANK.alemanes) {
             String agenteConversacion = "";
             
             if (!mensajesRecibidos.isEmpty()) {
@@ -55,11 +53,10 @@ public class Controlador extends AgenteBase {
                 mensajesRecibidos.remove(0);
             }
             else {
-                in = new ACLMessage();
                 in = blockingReceive(2000);
             }
             
-            if (in.getSender() != null) {
+            if (in != null) {
                 switch(in.getPerformative()) {
                     case ACLMessage.INFORM:
                         agenteConversacion = in.getSender().getName();

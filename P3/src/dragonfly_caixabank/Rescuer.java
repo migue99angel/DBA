@@ -19,6 +19,7 @@ public class Rescuer extends Dron {
     protected boolean escuchando = true;
     protected int energy = 995;
     protected int altimeter;
+    protected int alemanesEnDron = 0;
     
     @Override
     public void setup() {
@@ -68,11 +69,12 @@ public class Rescuer extends Dron {
                     Info (Integer.toString(ruta.size()));
                     Info("Ruta recibida correctamente");
                     
-                    seguirRuta(ruta, Rescuer.alemanesEncontrados);
+                    seguirRuta(ruta);
                     
                     Info("Aleman rescatado correctamente");
                     
                     Rescuer.alemanesEncontrados++;
+                    this.alemanesEnDron++;
                     leerSensores();
                     enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
                     
@@ -83,6 +85,32 @@ public class Rescuer extends Dron {
                     break;
             }
         }
+        
+        if (this.alemanesEnDron > 0){
+            //Volver al punto inicial
+            in = blockingReceive();
+            aux = new JsonObject();
+            aux.add("posx", this.posx);
+            aux.add("posy", this.posy);
+            aux.add("energy", this.energy);
+            aux.add("altimeter", this.altimeter);
+            aux.add("orientacion", this.orientacion);
+            aux.add("cuadrante", this.cuadrante);
+            aux.add("posIniX", this.posInix);
+            aux.add("posIniY", this.posIniy);
+            Info ("Enviando mi posicion al listener");
+            enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
+            enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
+
+            in = blockingReceive();
+            ruta = Json.parse(in.getContent()).asArray();
+            Info (in.getContent());
+            Info (Integer.toString(ruta.size()));
+            Info("Ruta recibida correctamente");
+
+            seguirRuta(ruta);
+        }
+
     }
 
     @Override

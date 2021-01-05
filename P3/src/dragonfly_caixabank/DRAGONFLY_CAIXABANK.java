@@ -22,7 +22,7 @@ public class DRAGONFLY_CAIXABANK {
     protected static ArrayList<String> dronesRescuer = new ArrayList<>();
     protected static JsonArray posicionesRescuer = new JsonArray();
     protected static ArrayList<String> dronesListener = new ArrayList<>();
-    protected static String dronControlador = "CaixaBank_Controlador";
+    protected static String dronControlador = "CaixaBank_Controlador_v2";
     protected static String agenteAwacs = "Agente_Awacs_v3";
     
     //Los alemanes a rescatar por mundo
