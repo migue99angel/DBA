@@ -22,22 +22,23 @@ public class DRAGONFLY_CAIXABANK {
     protected static ArrayList<String> dronesRescuer = new ArrayList<>();
     protected static JsonArray posicionesRescuer = new JsonArray();
     protected static ArrayList<String> dronesListener = new ArrayList<>();
-    protected static String dronControlador = "CaixaBank_Controlador_v2";
-    protected static String agenteAwacs = "Agente_Awacs_v4";
+    protected static String dronControlador = "CaixaBank_Controlador_v20";
+    protected static String agenteAwacs = "Agente_Awacs_v18";
     
     //Los alemanes a rescatar por mundo
-    protected static final int alemanes = 8;
-    protected static String _filename="Playground2";
+    protected static final int alemanes = 10;
+    protected static final int MAX_FLIGHT = 256;
+    protected static String _filename="World6";
 
     public static void main(String[] args) {
         
-        dronesSeeker.add("CaixaBank_Seeker0_v2");
-        dronesSeeker.add("CaixaBank_Seeker1_v2");
+        dronesSeeker.add("CaixaBank_Seeker0_v20");
+        dronesSeeker.add("CaixaBank_Seeker1_v20");
         
-        dronesRescuer.add("CaixaBank_Rescuer0_v2");
-        dronesRescuer.add("CaixaBank_Rescuer1_v2");
+        dronesRescuer.add("CaixaBank_Rescuer0_v20");
+        dronesRescuer.add("CaixaBank_Rescuer1_v20");
         
-        dronesListener.add("CaixaBank_Listener0_v2");
+        dronesListener.add("CaixaBank_Listener0_v20");
 
         
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);

@@ -45,7 +45,7 @@ public class Controlador extends AgenteBase {
         // Autorizar la entrada al mundo
         autorizarEntradaMundo();
         
-        while (Rescuer.alemanesEncontrados < DRAGONFLY_CAIXABANK.alemanes) {
+        while (Rescuer.alemanesEncontrados < DRAGONFLY_CAIXABANK.alemanes || contador > 0) {
             String agenteConversacion = "";
             
             if (!mensajesRecibidos.isEmpty()) {
@@ -87,7 +87,7 @@ public class Controlador extends AgenteBase {
                 }
             }
         }
-        
+        /*
         // Recibir la señal de cada agente y desloguearlos
         while(contador > 0) {
             in = new ACLMessage();
@@ -100,7 +100,7 @@ public class Controlador extends AgenteBase {
                 Info("El agente " + in.getSender() + " avisa que se ha deslogueado");
                 contador--;
             }
-        }
+        }*/
         
         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.CANCEL, "REGULAR", "", myConvId, false);
         in = blockingReceive();
@@ -238,6 +238,7 @@ public class Controlador extends AgenteBase {
         } else {
             Info("SUBSCRIBE WM OK de Agente " + getAID());
             myConvId = in.getConversationId();
+            Info("WM: " + in.getContent());
         }
     }
     

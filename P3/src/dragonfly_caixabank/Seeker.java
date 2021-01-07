@@ -13,6 +13,14 @@ public class Seeker extends Dron {
     protected int energy = 995;
     protected int altimeter;
     
+    /*
+        ALIVE --> 1
+        ALTIMETER --> 1
+        GPS --> 1
+        THERMALHQ --> 4
+    */
+    protected static int consumo = 7;
+    
     @Override
     public void setup() {
         super.setup();
@@ -25,6 +33,8 @@ public class Seeker extends Dron {
         sensoresRequeridos.add("ALTIMETER");
         sensoresRequeridos.add("GPS");
         sensoresRequeridos.add("THERMALHQ");
+        
+        
         sensoresRequeridos.add("CHARGE");
         sensoresRequeridos.add("CHARGE");
         
@@ -139,6 +149,43 @@ public class Seeker extends Dron {
             case "altimeter":
                 this.altimeter = o.get("data").asArray().get(0).asInt();
                 break;
+        }
+    }
+    
+    @Override
+    protected void seguirRuta(JsonArray ruta) {
+        JsonObject aux = new JsonObject();
+        
+        for (int i=0; i < ruta.size() && (Seeker.alemanesDetectados < DRAGONFLY_CAIXABANK.alemanes); i++){
+            switch(ruta.get(i).asObject().get("action").asString()){
+                case "move":
+                    aux = new JsonObject();
+                    movimiento = ruta.get(i).asObject().get("value").asString();
+                    aux.add("operation", movimiento);
+                    enviarMensaje(myWorldManager, ACLMessage.REQUEST, "REGULAR", aux.toString(), myConvId, false);
+                    
+                    in = blockingReceive();
+                    
+                    if (in.getPerformative() != ACLMessage.INFORM){
+                        Info("Fallo al realizar " + movimiento);
+                        Info(Integer.toString(in.getPerformative()));
+                        Info(in.getContent());
+                        abortSession();
+                    }
+                    break;
+                case "read":
+                    leerSensores();
+                    
+                    break;
+                    
+                case "recharge":
+                    recargar();
+                    
+                    break;
+                case "inform":
+                    this.energy = ruta.get(i).asObject().get("value").asInt();
+                    break;
+            }
         }
     }
 }
