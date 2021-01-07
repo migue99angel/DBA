@@ -77,7 +77,7 @@ public abstract class AgenteBase extends IntegratedAgent {
             in = blockingReceive();
             
             if(in.getPerformative() == ACLMessage.CONFIRM || (in.getPerformative() == ACLMessage.INFORM && in.getContent().contains("ok"))) {
-                Info("SUBSCRIBE OK de Agente " + getAID());
+                Info("[SPHINX] SUBSCRIBE OK de Agente " + getAID());
                 
                 mySphinxConvId = in.getConversationId();
                 

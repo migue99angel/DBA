@@ -61,7 +61,7 @@ public class Controlador extends AgenteBase {
                     case ACLMessage.INFORM:
                         agenteConversacion = in.getSender().getName();
                         Info("El agente " + agenteConversacion + " solicita comprar una recarga");
-                        enviarMensaje(agenteConversacion, ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
+                        enviarMensaje(agenteConversacion.replace("@DBA", ""), ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
                         Info("Confirmamos la peticición de compra de recarga al agente " + agenteConversacion);
                         Info("Esperando la confirmación de compra de recarga del agente " + agenteConversacion);
                         do {
@@ -77,8 +77,12 @@ public class Controlador extends AgenteBase {
                             }
                         } while (!in.getSender().getName().equals(agenteConversacion));
                         break;
+                    case ACLMessage.CANCEL:
+                        Info("El agente " + in.getSender() + " avisa que se ha deslogueado");
+                        contador--;
+                        break;
                     default:
-                        Info("No puedo manejar el mensaje recibido " + in.getContent());
+                        Info("No puedo manejar el mensaje recibido: " + in);
                         break;
                 }
             }
@@ -89,7 +93,7 @@ public class Controlador extends AgenteBase {
             in = new ACLMessage();
             in = blockingReceive();
             
-            if(in.getPerformative() != ACLMessage.INFORM) {
+            if(in.getPerformative() != ACLMessage.CANCEL) {
                 Info("El agente " + in.getSender() + " no se ha podido desloguear correctamente");
                 abortSession();
             } else {

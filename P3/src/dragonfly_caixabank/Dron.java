@@ -29,6 +29,7 @@ public abstract class Dron extends AgenteBase{
     protected int posIniy = 0;
     protected int orientacion = 90;
     protected int cuadrante;
+    protected int energy = 995;
     protected String movimiento;
     
     @Override
@@ -75,7 +76,7 @@ public abstract class Dron extends AgenteBase{
             logout();
             
             // Avisamos al Controlador de que nos deslogueamos
-            enviarMensaje(DRAGONFLY_CAIXABANK.dronControlador, ACLMessage.INFORM, "REGULAR", "", myConvId, false);
+            enviarMensaje(DRAGONFLY_CAIXABANK.dronControlador, ACLMessage.CANCEL, "REGULAR", "", myConvId, false);
         }
         
         takeDown();
@@ -282,11 +283,14 @@ public abstract class Dron extends AgenteBase{
         JsonObject aux = new JsonObject();
         movimiento = "recharge";
         aux.add("operation", movimiento);
+        Info("Vamos a recargar)");
         
         if (myRechargeTickets.isEmpty()) {
         
-            sensoresRequeridos.clear();
-            sensoresRequeridos.add("CHARGE");
+            this.productos.clear();
+            this.sensoresRequeridos.clear();
+            this.sensoresRequeridos.add("CHARGE");
+            Info("Lista de la compra: " + this.sensoresRequeridos);
             this.hacerCompras();
         }
         
@@ -336,6 +340,9 @@ public abstract class Dron extends AgenteBase{
                 case "recharge":
                     recargar();
                     
+                    break;
+                case "inform":
+                    this.energy = ruta.get(i).asObject().get("value").asInt();
                     break;
             }
         }

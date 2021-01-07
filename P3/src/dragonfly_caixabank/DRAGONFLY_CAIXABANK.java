@@ -23,11 +23,11 @@ public class DRAGONFLY_CAIXABANK {
     protected static JsonArray posicionesRescuer = new JsonArray();
     protected static ArrayList<String> dronesListener = new ArrayList<>();
     protected static String dronControlador = "CaixaBank_Controlador_v2";
-    protected static String agenteAwacs = "Agente_Awacs_v3";
+    protected static String agenteAwacs = "Agente_Awacs_v4";
     
     //Los alemanes a rescatar por mundo
-    protected static final int alemanes = 10;
-    protected static String _filename="Playground1";
+    protected static final int alemanes = 8;
+    protected static String _filename="Playground2";
 
     public static void main(String[] args) {
         

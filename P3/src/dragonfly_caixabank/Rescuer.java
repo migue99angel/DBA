@@ -16,8 +16,7 @@ import jade.lang.acl.ACLMessage;
  */
 public class Rescuer extends Dron {
     protected static int alemanesEncontrados = 0;
-    protected boolean escuchando = true;
-    protected int energy = 995;
+    protected static boolean escuchando = true;
     protected int altimeter;
     protected int alemanesEnDron = 0;
     
@@ -45,49 +44,60 @@ public class Rescuer extends Dron {
         leerSensores();
         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
         
-        while(escuchando) {
+        while(Rescuer.escuchando) {
             Info ("Escuchando mensajes");
-            in = blockingReceive();
-            
-            switch(in.getPerformative()) {
-                case ACLMessage.QUERY_IF:
-                    
-                    aux = new JsonObject();
-                    aux.add("posx", this.posx);
-                    aux.add("posy", this.posy);
-                    aux.add("energy", this.energy);
-                    aux.add("altimeter", this.altimeter);
-                    aux.add("orientacion", this.orientacion);
-                    aux.add("cuadrante", this.cuadrante);
-                    Info ("Enviando mi posicion al listener");
-                    enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
-                    break;
-                    
-                case ACLMessage.QUERY_REF:
-                    ruta = Json.parse(in.getContent()).asArray();
-                    Info (in.getContent());
-                    Info (Integer.toString(ruta.size()));
-                    Info("Ruta recibida correctamente");
-                    
-                    seguirRuta(ruta);
-                    
-                    Info("Aleman rescatado correctamente");
-                    
-                    Rescuer.alemanesEncontrados++;
-                    this.alemanesEnDron++;
-                    leerSensores();
-                    enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
-                    
-                    if(DRAGONFLY_CAIXABANK.alemanes == Rescuer.alemanesEncontrados) {
-                        escuchando = false;
-                    }
-                    
-                    break;
+            in = blockingReceive(5000);
+            if (in != null){
+                switch(in.getPerformative()) {
+                    case ACLMessage.QUERY_IF:
+
+                        aux = new JsonObject();
+                        aux.add("posx", this.posx);
+                        aux.add("posy", this.posy);
+                        aux.add("energy", this.energy);
+                        aux.add("altimeter", this.altimeter);
+                        aux.add("orientacion", this.orientacion);
+                        aux.add("cuadrante", this.cuadrante);
+                        aux.add("posIniX", this.posInix);
+                        aux.add("posIniY", this.posIniy);
+                        Info ("Enviando mi posicion al listener");
+                        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
+                        break;
+
+                    case ACLMessage.QUERY_REF:
+                        ruta = Json.parse(in.getContent()).asArray();
+                        Info (in.getContent());
+                        Info (Integer.toString(ruta.size()));
+                        Info("Ruta recibida correctamente");
+
+                        seguirRuta(ruta);
+
+                        Info("Aleman rescatado correctamente");
+
+                        Rescuer.alemanesEncontrados++;
+                        this.alemanesEnDron++;
+                        leerSensores();
+                        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
+
+                        if(DRAGONFLY_CAIXABANK.alemanes == Rescuer.alemanesEncontrados) {
+                            Rescuer.escuchando = false;
+                        }
+
+                        break;
+                    case ACLMessage.INFORM:
+                        Info("Mis coordenadas se han enviado correctamente");
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-        
+        Info("Llevo " + this.alemanesEnDron + " alemanes");
         if (this.alemanesEnDron > 0){
             //Volver al punto inicial
+            if (in == null){
+                enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
+            }
             in = blockingReceive();
             aux = new JsonObject();
             aux.add("posx", this.posx);
@@ -100,15 +110,23 @@ public class Rescuer extends Dron {
             aux.add("posIniY", this.posIniy);
             Info ("Enviando mi posicion al listener");
             enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
-            enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
-
             in = blockingReceive();
-            ruta = Json.parse(in.getContent()).asArray();
-            Info (in.getContent());
-            Info (Integer.toString(ruta.size()));
-            Info("Ruta recibida correctamente");
+            
+            if (in.getPerformative() != ACLMessage.INFORM){
+                Info("Ha habido un fallo a la hora de enviar mis coordenadas");
+                abortSession();
+            } else {
+                enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.QUERY_IF, "REGULAR", "", myConvId, false);
 
-            seguirRuta(ruta);
+                in = blockingReceive();
+                ruta = Json.parse(in.getContent()).asArray();
+                Info (in.getContent());
+                Info (Integer.toString(ruta.size()));
+                Info("Ruta recibida correctamente");
+
+                seguirRuta(ruta);
+            }
+            
         }
 
     }

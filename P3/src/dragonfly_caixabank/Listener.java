@@ -170,6 +170,9 @@ public class Listener extends AgenteBase{
                         this.estadoRescuer0.add("cuadrante", Json.parse(in.getContent()).asObject().get("cuadrante").asInt());
                         this.estadoRescuer0.add("altimeter", Json.parse(in.getContent()).asObject().get("altimeter").asInt());
                         this.estadoRescuer0.add("orientacion", Json.parse(in.getContent()).asObject().get("orientacion").asInt());
+                        this.estadoRescuer0.add("posIniX", Json.parse(in.getContent()).asObject().get("posIniX").asInt());
+                        this.estadoRescuer0.add("posIniY", Json.parse(in.getContent()).asObject().get("posIniY").asInt());
+                        
                     } else if (in.getSender().getName().replace("@DBA", "").contains(DRAGONFLY_CAIXABANK.dronesRescuer.get(1))) {
                         Info ("Guardando la informacion del rescuer 1");
                         this.estadoRescuer1 = new JsonObject();
@@ -179,7 +182,11 @@ public class Listener extends AgenteBase{
                         this.estadoRescuer1.add("cuadrante", Json.parse(in.getContent()).asObject().get("cuadrante").asInt());
                         this.estadoRescuer1.add("altimeter", Json.parse(in.getContent()).asObject().get("altimeter").asInt());
                         this.estadoRescuer1.add("orientacion", Json.parse(in.getContent()).asObject().get("orientacion").asInt());
+                        this.estadoRescuer1.add("posIniX", Json.parse(in.getContent()).asObject().get("posIniX").asInt());
+                        this.estadoRescuer1.add("posIniY", Json.parse(in.getContent()).asObject().get("posIniY").asInt());
                     }
+                    
+                    enviarMensaje(in.getSender().getName().replace("@DBA", ""),ACLMessage.INFORM, "REGULAR", "", myConvId, false);
                     
                     break;
                  
@@ -425,6 +432,7 @@ public class Listener extends AgenteBase{
         altura += mapa.getLevel(posIniX, posIniY);
         
         Info("Altura de la 13,50: " + mapa.getLevel(13, 50));
+        Info("energia inicial: " + energy);
             
         if(posIniX < posDestinoX) {
             while(orientacion != 90) {
@@ -496,8 +504,9 @@ public class Listener extends AgenteBase{
             energy -= 4;
             ruta.add(aux);
             
-            // @todo Calcular cuándo es necesario recargar            
-            if(energy < 200) {
+            // @todo Calcular cuándo es necesario recargar 
+            Info("energia antes comprobacion: " + energy);
+            if(energy < 300) {
                 aux = new JsonObject();
                 
                 while(altura > mapa.getLevel(posIniX, posIniY)) {                   
@@ -505,6 +514,7 @@ public class Listener extends AgenteBase{
                     aux.add("value", "moveD");
                     altura -= 5;
                     ruta.add(aux);
+                    energy -= 20;
                     
                     aux = new JsonObject();
                 }
@@ -514,6 +524,7 @@ public class Listener extends AgenteBase{
                 aux.add("action", "move");
                 aux.add("action", "recharge");
                 ruta.add(aux);
+                energy = 995;
             }
         }
             
@@ -582,8 +593,9 @@ public class Listener extends AgenteBase{
             energy -= 4;
             ruta.add(aux);
             
-            // @todo Calcular cuándo es necesario recargar            
-            if(energy < 200) {
+            // @todo Calcular cuándo es necesario recargar 
+            Info("energia antes comprobacion: " + energy);
+            if(energy < 300) {
                 aux = new JsonObject();
                 
                 while(altura > mapa.getLevel(posIniX, posIniY)) {                   
@@ -591,6 +603,7 @@ public class Listener extends AgenteBase{
                     aux.add("value", "moveD");
                     altura -= 5;
                     ruta.add(aux);
+                    energy-= 20;
                     
                     aux = new JsonObject();
                 }
@@ -600,6 +613,7 @@ public class Listener extends AgenteBase{
                 aux.add("action", "move");
                 aux.add("action", "recharge");
                 ruta.add(aux);
+                energy = 995;
             }
         }
         
@@ -609,6 +623,7 @@ public class Listener extends AgenteBase{
             aux.add("value", "moveD");
             altura -= 5;
             ruta.add(aux);
+            energy -= 20;
         }
  
         if (!volviendoACasa){
@@ -624,15 +639,27 @@ public class Listener extends AgenteBase{
                     aux.add("value", "rotateR");
                     orientacion += 45;
                     ruta.add(aux);
+                    energy -= 4;
                 } else{
                     aux = new JsonObject();
                     aux.add("action", "move");
                     aux.add("value", "rotateL");
                     orientacion -= 45;
                     ruta.add(aux);
+                    energy -= 4;
                 }
             }
+        } else {
+            aux = new JsonObject();
+            aux.add("action", "move");
+            aux.add("value", "touchD");
+            ruta.add(aux);
         }
+        
+        aux = new JsonObject();
+        aux.add("action", "inform");
+        aux.add("value", energy);
+        ruta.add(aux);
         
         return ruta;
     }  

@@ -108,6 +108,7 @@ public class Seeker extends Dron {
                     if(in.getPerformative() == ACLMessage.CONFIRM) {
                         Info("Alemán confirmado");
                         Seeker.alemanesDetectados++;
+                        Info("Alemanes detectados: " + Seeker.alemanesDetectados);
                     } else if(in.getPerformative() != ACLMessage.DISCONFIRM) {
                         Info("Fallo al encontrar alemán");
                         Info(in.getContent());
