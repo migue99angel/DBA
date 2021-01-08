@@ -6,7 +6,14 @@ import com.eclipsesource.json.JsonObject;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 
-
+/**
+ * Clase Controlador. Se encarga de los primeros pasos en la práctica: despertar a los drones, autorizar las compras...
+ * @version 1.0
+ * @author Francisco Domínguez Lorente
+ * @author José María Gómez García
+ * @author Miguel Muñoz Molina
+ * @author Miguel Ángel Posadas Arráez
+ */
 public class Controlador extends AgenteBase {
     private int contador = 0;
     private int alemanesRescatados = 0;
@@ -34,12 +41,16 @@ public class Controlador extends AgenteBase {
     public void plainExecute() {       
         super.plainExecute();
         
+        // Iniciamos sesión en el World Manager
         loginWorldManager();
-
+        
+        // Despertamos a todos los agentes
         despertarAgentes();
         
+        // Autorizamos las compras necesarias
         autorizarCompra();
         
+        // Calculamos las posiciones iniciales de cada dron
         calcularPosicionesIniciales();
         
         // Autorizar la entrada al mundo
@@ -51,8 +62,7 @@ public class Controlador extends AgenteBase {
             if (!mensajesRecibidos.isEmpty()) {
                 in = mensajesRecibidos.get(0);
                 mensajesRecibidos.remove(0);
-            }
-            else {
+            } else {
                 in = blockingReceive(2000);
             }
             
@@ -64,6 +74,7 @@ public class Controlador extends AgenteBase {
                         enviarMensaje(agenteConversacion.replace("@DBA", ""), ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
                         Info("Confirmamos la peticición de compra de recarga al agente " + agenteConversacion);
                         Info("Esperando la confirmación de compra de recarga del agente " + agenteConversacion);
+                        
                         do {
                             in = new ACLMessage();
                             in = blockingReceive();
@@ -77,30 +88,18 @@ public class Controlador extends AgenteBase {
                             }
                         } while (!in.getSender().getName().equals(agenteConversacion));
                         break;
+                        
                     case ACLMessage.CANCEL:
                         Info("El agente " + in.getSender() + " avisa que se ha deslogueado");
                         contador--;
                         break;
+                        
                     default:
                         Info("No puedo manejar el mensaje recibido: " + in);
                         break;
                 }
             }
         }
-        /*
-        // Recibir la señal de cada agente y desloguearlos
-        while(contador > 0) {
-            in = new ACLMessage();
-            in = blockingReceive();
-            
-            if(in.getPerformative() != ACLMessage.CANCEL) {
-                Info("El agente " + in.getSender() + " no se ha podido desloguear correctamente");
-                abortSession();
-            } else {
-                Info("El agente " + in.getSender() + " avisa que se ha deslogueado");
-                contador--;
-            }
-        }*/
         
         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.CANCEL, "REGULAR", "", myConvId, false);
         in = blockingReceive();
@@ -118,6 +117,9 @@ public class Controlador extends AgenteBase {
         _exitRequested = true;
     }
     
+    /**
+     * Envía un mensaje a cada uno de los drones del sistema para despertarlos
+     */
     protected void despertarAgentes() {
         Info("Controlador despertando a los agentes");
         
@@ -175,6 +177,10 @@ public class Controlador extends AgenteBase {
         }
     }
     
+    /**
+     * Recibimos un mensaje de cada dron que necesite comprar y posteriormente le enviamos un mensaje autorizándolo
+     * a realizar la compra
+     */
     protected void autorizarCompra() {
         int contadorCopia = DRAGONFLY_CAIXABANK.dronesSeeker.size() +
                 DRAGONFLY_CAIXABANK.dronesRescuer.size();
@@ -209,6 +215,9 @@ public class Controlador extends AgenteBase {
         }
     }
     
+    /**
+     * Envia un mensaje de confirmación a cada dron para autorizarle la entrada al mundo
+     */
     protected void autorizarEntradaMundo() {
         
         for(int i=0; i < DRAGONFLY_CAIXABANK.dronesSeeker.size(); i++) {
@@ -223,48 +232,50 @@ public class Controlador extends AgenteBase {
     
     @Override
     protected void loginWorldManager() {
-        Info("Login " + getAID());
+        Info("Login en World Manager");
         
         enviarMensaje(myWorldManager, ACLMessage.SUBSCRIBE, myWMProtocol, new JsonObject().add(myAction, myValue).toString(), "", false);
         
         in = blockingReceive();
         
         if(in.getPerformative() != ACLMessage.INFORM) {
-            Info("Error en SUBSCRIBE de WM de Agente " + getAID());
+            Info("Error en SUBSCRIBE de WM");
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
 
             abortSession();
         } else {
-            Info("SUBSCRIBE WM OK de Agente " + getAID());
+            Info("SUBSCRIBE WM OK");
             myConvId = in.getConversationId();
-            Info("WM: " + in.getContent());
         }
     }
     
+    /**
+     * Calcula las posiciones iniciales para los drones de cada tipo
+     */
     protected void calcularPosicionesIniciales(){
         JsonObject aux = new JsonObject();
         aux.add("cuadrante",0);
-        aux.add("posx",0 + radioThermal);
-        aux.add("posy",0 + radioThermal);
+        aux.add("posx", 0 + radioThermal);
+        aux.add("posy", 0 + radioThermal);
         posicionSeekers.add(aux);
         
         aux = new JsonObject();
         aux.add("cuadrante",1);
-        aux.add("posx",(width/2) + radioThermal);
-        aux.add("posy",0 + radioThermal);
+        aux.add("posx", (width/2) + radioThermal);
+        aux.add("posy", 0 + radioThermal);
         posicionSeekers.add(aux);
         
         aux = new JsonObject();
         aux.add("cuadrante",0);
-        aux.add("posx",width/4);
-        aux.add("posy",height/2);
+        aux.add("posx", width/4);
+        aux.add("posy", height/2);
         posicionRescuers.add(aux);
         
         aux = new JsonObject();
         aux.add("cuadrante",1);
-        aux.add("posx",3 * (width/4));
-        aux.add("posy",height/2);
+        aux.add("posx", 3 * (width/4));
+        aux.add("posy", height/2);
         posicionRescuers.add(aux);
     }
     
@@ -277,13 +288,13 @@ public class Controlador extends AgenteBase {
         in = blockingReceive();
         
         if(in.getPerformative() != ACLMessage.INFORM) {
-            Info("Error en CANCEL de WM de Agente " + getAID());
+            Info("Error en CANCEL de WM");
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
             
             abortSession();
         } else {
-            Info("Logout WM OK de Agente " + getAID());
+            Info("Logout WM OK");
         }
         
         super.logout();

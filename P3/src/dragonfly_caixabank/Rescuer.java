@@ -11,8 +11,12 @@ import com.eclipsesource.json.JsonObject;
 import jade.lang.acl.ACLMessage;
 
 /**
- *
- * @author mumo
+ * Clase para modelar a los drones de tipo Rescuer
+ * @version 1.0
+ * @author Francisco Domínguez Lorente
+ * @author José María Gómez García
+ * @author Miguel Muñoz Molina
+ * @author Miguel Ángel Posadas Arráez
  */
 public class Rescuer extends Dron {
     protected static int alemanesEncontrados = 0;
@@ -35,13 +39,17 @@ public class Rescuer extends Dron {
     }
     
     @Override
-    public void comportamiento(){
+    public void comportamiento() {
         JsonObject aux = new JsonObject();
         JsonArray ruta = new JsonArray();
         
-        //Recarga inicial
+        // Recarga inicial
         recargar();
+        
+        // Leemos los sensores
         leerSensores();
+        
+        // Informamos al listener
         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
         
         while(Rescuer.escuchando) {
@@ -61,14 +69,14 @@ public class Rescuer extends Dron {
                         aux.add("posIniX", this.posInix);
                         aux.add("posIniY", this.posIniy);
                         Info ("Enviando mi posicion al listener");
+                        
                         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
                         break;
 
                     case ACLMessage.QUERY_REF:
                         ruta = Json.parse(in.getContent()).asArray();
-                        Info (in.getContent());
-                        Info (Integer.toString(ruta.size()));
                         Info("Ruta recibida correctamente");
+                        Info("Distancia de la ruta: " + Integer.toString(ruta.size()));
 
                         seguirRuta(ruta);
 
@@ -76,6 +84,7 @@ public class Rescuer extends Dron {
 
                         Rescuer.alemanesEncontrados++;
                         this.alemanesEnDron++;
+                        
                         leerSensores();
                         enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
 
@@ -87,18 +96,23 @@ public class Rescuer extends Dron {
                     case ACLMessage.INFORM:
                         Info("Mis coordenadas se han enviado correctamente");
                         break;
+                        
                     default:
                         break;
                 }
             }
         }
-        Info("Llevo " + this.alemanesEnDron + " alemanes");
+        
+        Info("He rescatado a " + this.alemanesEnDron + " alemanes");
+        
         if (this.alemanesEnDron > 0){
             //Volver al punto inicial
             if (in == null){
                 enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.INFORM, "REGULAR", "", myConvId, false);
             }
+            
             in = blockingReceive();
+            
             aux = new JsonObject();
             aux.add("posx", this.posx);
             aux.add("posy", this.posy);
@@ -108,8 +122,11 @@ public class Rescuer extends Dron {
             aux.add("cuadrante", this.cuadrante);
             aux.add("posIniX", this.posInix);
             aux.add("posIniY", this.posIniy);
-            Info ("Enviando mi posicion al listener");
+            
+            Info("Enviando mi posicion al listener");
+            
             enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.AGREE, "REGULAR", aux.toString(), myConvId, false);
+            
             in = blockingReceive();
             
             if (in.getPerformative() != ACLMessage.INFORM){
@@ -120,10 +137,10 @@ public class Rescuer extends Dron {
 
                 in = blockingReceive();
                 ruta = Json.parse(in.getContent()).asArray();
-                Info (in.getContent());
-                Info (Integer.toString(ruta.size()));
                 Info("Ruta recibida correctamente");
-
+                Info("Distancia de la ruta: " + Integer.toString(ruta.size()));
+                Info("Volviendo a mi posición inicial");
+                
                 seguirRuta(ruta);
             }
             
@@ -136,11 +153,11 @@ public class Rescuer extends Dron {
         switch(o.get("sensor").asString())
         {
             case "gps":
-                Info(o.get("data").toString());
                 this.posx = o.get("data").asArray().get(0).asArray().get(0).asInt();
                 this.posy = o.get("data").asArray().get(0).asArray().get(1).asInt();
                 this.posz = o.get("data").asArray().get(0).asArray().get(2).asInt();
                 break;
+                
             case "altimeter":
                 this.altimeter = o.get("data").asArray().get(0).asInt();
                 break;

@@ -3,12 +3,18 @@ package dragonfly_caixabank;
 import ControlPanel.TTYControlPanel;
 import IntegratedAgent.IntegratedAgent;
 import YellowPages.YellowPages;
-import com.eclipsesource.json.JsonObject;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 
-
+/**
+ * Clase que hereda de IntegratedAgent, contiene la funcionalidad básica que heredarán el resto de drones
+ * @version 1.0
+ * @author Francisco Domínguez Lorente
+ * @author José María Gómez García
+ * @author Miguel Muñoz Molina
+ * @author Miguel Ángel Posadas Arráez
+ */
 public abstract class AgenteBase extends IntegratedAgent {
     TTYControlPanel myControlPanel;
     String receiver;
@@ -52,16 +58,20 @@ public abstract class AgenteBase extends IntegratedAgent {
         return "CaixaBank";
     }
     
+    /**
+     * Inicio de sesión en el IdentityManager. En el proceso nos devuelve el conversationID con Sphinx, así como
+     * el WorldManager, disponible a través de las YellowPages.
+     */
     protected void loginSphinx() {
         
-        Info("Requesting checkin to " + _identitymanager + " from agent " + getAID());
+        Info("Requesting checkin to " + _identitymanager + " from agent");
         
         enviarMensaje(_identitymanager, ACLMessage.QUERY_IF, "ANALYTICS", "", "", true);
         
         in = this.blockingReceive();
         
         if(in.getPerformative() != ACLMessage.CONFIRM) {
-            Info("Error en QUERY_IF de Sphinx de Agente " + getAID());
+            Info("Error en QUERY_IF de Sphinx");
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
             
@@ -77,7 +87,7 @@ public abstract class AgenteBase extends IntegratedAgent {
             in = blockingReceive();
             
             if(in.getPerformative() == ACLMessage.CONFIRM || (in.getPerformative() == ACLMessage.INFORM && in.getContent().contains("ok"))) {
-                Info("[SPHINX] SUBSCRIBE OK de Agente " + getAID());
+                Info("SUBSCRIBE OK de Agente");
                 
                 mySphinxConvId = in.getConversationId();
                 
@@ -90,20 +100,19 @@ public abstract class AgenteBase extends IntegratedAgent {
                 in = blockingReceive();
                 
                 if(in.getPerformative() == ACLMessage.INFORM) {
-                    Info("QUERY_REF OK de Agente " + getAID());
+                    Info("QUERY_REF OK de Agente");
                     yp.updateYellowPages(in);
-                    //System.out.println("\n" + yp.prettyPrint());
                                        
                     myWorldManager = yp.queryProvidersofService(myService).iterator().next();
                 } else {
-                    Info("Error en QUERY_REF de Sphinx de Agente " + getAID());
+                    Info("Error en QUERY_REF de Sphinx");
                     Info(in.getContent());
                     Info(Integer.toString(in.getPerformative()));
 
                     abortSession();
                 }
             } else {
-                Info("Error en SUBSCRIBE de Sphinx de Agente " + getAID());
+                Info("Error en SUBSCRIBE de Sphinx");
                 Info(in.getContent());
                 Info(Integer.toString(in.getPerformative()));
 
@@ -112,8 +121,16 @@ public abstract class AgenteBase extends IntegratedAgent {
         }
     }
     
+    
+    /**
+     * Inicio de sesión en el WorldManager
+     */
     protected abstract void loginWorldManager();
     
+    
+    /**
+     * Cerrar la sesión del IdentityMaanger
+     */
     protected void logout() {
         Info("Requesting logout to " + _identitymanager);
         
@@ -122,16 +139,25 @@ public abstract class AgenteBase extends IntegratedAgent {
         in = blockingReceive();
         
         if(in.getPerformative() != ACLMessage.INFORM) {
-            Info("Error en CANCEL de Sphinx de Agente " + getAID());
+            Info("Error en CANCEL de Sphinx de Agente");
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
             
             abortSession();
         } else {
-            Info("Logout OK de Agente " + getAID());
+            Info("Logout OK de Agente");
         }
     }
     
+    /**
+     * Envia un mensaje
+     * @param receiver El receptor del mensaje
+     * @param performative La performativa ACLMessage a usar en el mensaje
+     * @param protocol El protocolo del mensaje
+     * @param content El contenido del mensaje
+     * @param conversationID El conversationID a usar en el envío del mensaje
+     * @param cardID El cardID a usar en el envío del mensaje
+     */
     protected void enviarMensaje(String receiver, int performative, String protocol, String content, String conversationID, boolean cardID) {
         out = new ACLMessage();
         out.setSender(getAID());

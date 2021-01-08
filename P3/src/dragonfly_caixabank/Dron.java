@@ -12,10 +12,14 @@ import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 
 /**
- *
- * @author mumo
+ * Clase Dron que implementa el comportamiento común de los distintos tipos de drones
+ * @version 1.0
+ * @author Francisco Domínguez Lorente
+ * @author José María Gómez García
+ * @author Miguel Muñoz Molina
+ * @author Miguel Ángel Posadas Arráez
  */
-public abstract class Dron extends AgenteBase{
+public abstract class Dron extends AgenteBase {
     
     protected JsonArray myCoins;
     protected ArrayList<String> sensoresRequeridos = new ArrayList<>();
@@ -43,16 +47,16 @@ public abstract class Dron extends AgenteBase{
         
         // Esperamos a que el Controlador nos despierte
         in = new ACLMessage();
-        Info("Agente " + getAID() + " esperando a ser despertado");
+        Info("Agente Esperando a ser despertado");
         in = blockingReceive();
         
         if(in.getPerformative() != ACLMessage.QUERY_IF) {
-            Info("Agente " + getAID() + " no ha recibido QUERY_IF");
+            Info("Agente no ha recibido QUERY_IF");
             Info(Integer.toString(in.getPerformative()));
 
             abortSession();
         } else {
-            Info("Agente " + getAID() + " despertado");
+            Info("Agente Despertado");
             
             // Informamos al Controlador
             enviarMensaje(DRAGONFLY_CAIXABANK.dronControlador, ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
@@ -85,24 +89,27 @@ public abstract class Dron extends AgenteBase{
     
     @Override
     protected void loginWorldManager() {
-        Info("Login al World Manager de " + getAID());
+        Info("Login al World Manager");
         
         enviarMensaje(myWorldManager, ACLMessage.SUBSCRIBE, myWMProtocol, new JsonObject().add(myAction, myValue).toString(), myConvId, false);
         
         in = blockingReceive();
         
         if(in.getPerformative() != ACLMessage.INFORM) {
-            Info("Error en SUBSCRIBE de WM de Agente " + getAID());
+            Info("Error en SUBSCRIBE de WM");
             Info(in.getContent());
             Info(Integer.toString(in.getPerformative()));
 
             abortSession();
         } else {
-            Info("SUBSCRIBE WM OK de Agente " + getAID());
+            Info("SUBSCRIBE WM OK");
             myCoins = Json.parse(in.getContent()).asObject().get("coins").asArray();
         }
     }
     
+    /**
+     * Nos comunicamos con el Controlador para realizar todas las compras necesarias
+     */
     protected void hacerCompras() {
         // Enviamos mensaje al controlador
         enviarMensaje(DRAGONFLY_CAIXABANK.dronControlador, ACLMessage.INFORM, "REGULAR", "", myConvId, false);
@@ -143,7 +150,6 @@ public abstract class Dron extends AgenteBase{
         for(int i=0; i < tiendas.size(); i++) {
             JsonObject aux = new JsonObject();
             JsonArray referencias;
-            JsonArray productosAux = new JsonArray();
             
             enviarMensaje(tiendas.get(i), ACLMessage.QUERY_REF, "REGULAR", aux.toString(), myConvId, false);
             
@@ -206,11 +212,9 @@ public abstract class Dron extends AgenteBase{
                 
                 if (Json.parse(in.getContent()).asObject().get("reference").toString().contains("CHARGE")){
                     Info("Compra del ticket de recarga " + productos.get(i) + " realizada con éxito");
-                    Info(in.getContent());
                     myRechargeTickets.add(Json.parse(in.getContent()).asObject().get("reference").asString());
                 } else {
                     Info("Compra del sensor " + productos.get(i) + " realizada con éxito");
-                    Info(in.getContent());
                     mySensors.add(Json.parse(in.getContent()).asObject().get("reference"));
                 }
             }
@@ -220,6 +224,9 @@ public abstract class Dron extends AgenteBase{
         enviarMensaje(DRAGONFLY_CAIXABANK.dronControlador, ACLMessage.CONFIRM, "REGULAR", "", myConvId, false);
     }
     
+    /**
+     * Esperamos a que el Controlador nos autorize la entrada al mundo
+     */
     protected void esperarEntradaMundo() {
         Info("Esperando autorización para entrar al mundo");
         in = blockingReceive();
@@ -227,7 +234,7 @@ public abstract class Dron extends AgenteBase{
         if(in.getPerformative() != ACLMessage.CONFIRM) {
             Info("No se me ha concedido la entrada al mundo");
             abortSession();
-        } else{
+        } else {
             this.cuadrante = Json.parse(in.getContent()).asObject().get("cuadrante").asInt();
             this.posx = Json.parse(in.getContent()).asObject().get("posx").asInt();
             this.posy = Json.parse(in.getContent()).asObject().get("posy").asInt();
@@ -236,6 +243,11 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
+    /**
+     * Enviamos una petición al World Manager para entrar al mundo
+     * @param posx Posición inicial de entrada en el eje X
+     * @param posy Posición inicial de entrada en el eje Y
+     */
     protected void entrarAlMundo(int posx, int posy) {
         JsonObject content = new JsonObject();
         content.add("operation", "login");
@@ -256,6 +268,12 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
+    /**
+     * Nos quedamos con el producto más barato de entre todas las tiendas en las que esté disponible
+     * @param o El producto a comprobar
+     * @param tienda La tienda donde se encuentra
+     * @param tipo El tipo de producto
+     */
     protected void comprobarProducto(JsonObject o, String tienda, String tipo) {
         boolean existe = false;
         
@@ -279,11 +297,13 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
+    /**
+     * Realizamos las operaciones de recarga de nuestro dron
+     */
     protected void recargar(){
         JsonObject aux = new JsonObject();
         movimiento = "recharge";
         aux.add("operation", movimiento);
-        Info("Vamos a recargar)");
         
         if (myRechargeTickets.isEmpty()) {
         
@@ -305,13 +325,16 @@ public abstract class Dron extends AgenteBase{
             Info(Integer.toString(in.getPerformative()));
             Info(in.getContent());
             abortSession();
-        } else{
+        } else {
             Info("Recarga realizada con exito");
-            Info(in.getContent());
             
         }
     }
     
+    /**
+     * Seguir una ruta dada
+     * @param ruta JsonArray con todos los movimientos a realizar en el mundo
+     */
     protected void seguirRuta(JsonArray ruta) {
         JsonObject aux = new JsonObject();
         
@@ -332,6 +355,7 @@ public abstract class Dron extends AgenteBase{
                         abortSession();
                     }
                     break;
+                    
                 case "read":
                     leerSensores();
                     
@@ -341,6 +365,7 @@ public abstract class Dron extends AgenteBase{
                     recargar();
                     
                     break;
+                    
                 case "inform":
                     this.energy = ruta.get(i).asObject().get("value").asInt();
                     break;
@@ -348,6 +373,9 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
+    /**
+     * Enviamos una petición al World Manager para realizar una lectura de nuestros sensores
+     */
     protected void leerSensores(){
         JsonObject aux = new JsonObject();
         movimiento = "read";
@@ -364,7 +392,7 @@ public abstract class Dron extends AgenteBase{
             abortSession();
         } else {
             Info("Lectura de sensores realizada con exito");
-            Info(in.getContent()); 
+            
             JsonArray arrayAux = new JsonArray();
             arrayAux = Json.parse(in.getContent()).asObject().get("details").asObject().get("perceptions").asArray();
         
@@ -375,7 +403,14 @@ public abstract class Dron extends AgenteBase{
         }
     }
     
+    /**
+     * Leer los sensores concretos de cada dron
+     * @param o JsonObject con los sensores a leer
+     */
     protected abstract void lecturaSensoresConcretos(JsonObject o);
     
+    /**
+     * Define el comportamiento de cada dron
+     */
     protected abstract void comportamiento();
 }

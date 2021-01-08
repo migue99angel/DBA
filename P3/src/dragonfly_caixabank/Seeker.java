@@ -4,21 +4,21 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import jade.lang.acl.ACLMessage;
-import java.util.ArrayList;
 
+/**
+ * Clase para modelar a los drones de tipo Seeker
+ * @version 1.0
+ * @author Francisco Domínguez Lorente
+ * @author José María Gómez García
+ * @author Miguel Muñoz Molina
+ * @author Miguel Ángel Posadas Arráez
+ */
 public class Seeker extends Dron {
     protected static int alemanesDetectados = 0;
     protected JsonArray thermal = new JsonArray();
     protected JsonArray ruta = new JsonArray();
     protected int energy = 995;
     protected int altimeter;
-    
-    /*
-        ALIVE --> 1
-        ALTIMETER --> 1
-        GPS --> 1
-        THERMALHQ --> 4
-    */
     protected static int consumo = 7;
     
     @Override
@@ -29,33 +29,34 @@ public class Seeker extends Dron {
         myWMProtocol = "REGULAR";
         
         // Rellenamos el array con los sensores que queremos
-        sensoresRequeridos.add("ALIVE");
         sensoresRequeridos.add("ALTIMETER");
         sensoresRequeridos.add("GPS");
         sensoresRequeridos.add("THERMALHQ");
         
-        
-        sensoresRequeridos.add("CHARGE");
+        // La recarga requerida
         sensoresRequeridos.add("CHARGE");
         
     }
     
     @Override
-    public void comportamiento(){
-        JsonObject aux = new JsonObject();
-        //Recarga inicial
+    public void comportamiento() {
+        // Recarga inicial
         recargar();
         
+        // Leemos sensores
         leerSensores();
-        Info ("He leido sensores");
-        Info (posx + "," + posy + "," + posz + "");
+        
+        // Pedimos la ruta a seguir
         pedirRuta();
         
-        //Comportamiento general      
+        // Comportamiento general      
         seguirRuta(ruta);
 
     }
     
+    /**
+     * Pedir la ruta a seguir al Listener
+     */
     protected void pedirRuta(){
         Info("Pidiendo ruta");
         
@@ -69,23 +70,23 @@ public class Seeker extends Dron {
         aux.add("orientacion", this.orientacion);
         aux.add("altimeter", this.altimeter);
         
-        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0),ACLMessage.REQUEST,"REGULAR",aux.toString(),myConvId,false);
+        enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.REQUEST, "REGULAR", aux.toString(), myConvId, false);
         
         in = blockingReceive();
-        
-        //Gestionar la ruta
         
         if (in.getPerformative() != ACLMessage.INFORM){
             Info("Error al recibir la ruta");
             abortSession();
-        } else{
+        } else {
             this.ruta = Json.parse(in.getContent()).asArray();
-            Info (in.getContent());
-            Info (Integer.toString(this.ruta.size()));
             Info("Ruta recibida correctamente");
+            Info("Distancia de la ruta: " + Integer.toString(this.ruta.size()));
         }
     }
     
+    /**
+     * Leemos el sensor THERMAL para detectar posibles alemanes en nuestro entorno
+     */
     protected void detectarAlemanes() {
         JsonObject posicion = new JsonObject();
         int aleman_posx, aleman_posy;
@@ -103,7 +104,6 @@ public class Seeker extends Dron {
                     aleman_posy = i - posFijaY + this.posy;
                     
                     Info("Alemán encontrado en posición del mundo " + aleman_posx + "," + aleman_posy);
-                    Info("La posicion del dron es: " + posx + "," + posy);
                     
                     posicion.add("posx", aleman_posx);
                     posicion.add("posy", aleman_posy);
@@ -113,12 +113,10 @@ public class Seeker extends Dron {
                     enviarMensaje(DRAGONFLY_CAIXABANK.dronesListener.get(0), ACLMessage.QUERY_REF, "REGULAR", posicion.toString(), myConvId, false);
                     in = blockingReceive();
                     
-                    Info(in.toString());
-                    
                     if(in.getPerformative() == ACLMessage.CONFIRM) {
                         Info("Alemán confirmado");
                         Seeker.alemanesDetectados++;
-                        Info("Alemanes detectados: " + Seeker.alemanesDetectados);
+                        Info("Alemanes detectados hasta ahora: " + Seeker.alemanesDetectados);
                     } else if(in.getPerformative() != ACLMessage.DISCONFIRM) {
                         Info("Fallo al encontrar alemán");
                         Info(in.getContent());
@@ -140,12 +138,14 @@ public class Seeker extends Dron {
                 detectarAlemanes();
 
                 break;
+                
             case "gps":
-                Info(o.get("data").toString());
                 this.posx = o.get("data").asArray().get(0).asArray().get(0).asInt();
                 this.posy = o.get("data").asArray().get(0).asArray().get(1).asInt();
                 this.posz = o.get("data").asArray().get(0).asArray().get(2).asInt();
+                
                 break;
+                
             case "altimeter":
                 this.altimeter = o.get("data").asArray().get(0).asInt();
                 break;
@@ -173,6 +173,7 @@ public class Seeker extends Dron {
                         abortSession();
                     }
                     break;
+                    
                 case "read":
                     leerSensores();
                     
@@ -182,6 +183,7 @@ public class Seeker extends Dron {
                     recargar();
                     
                     break;
+                    
                 case "inform":
                     this.energy = ruta.get(i).asObject().get("value").asInt();
                     break;
